@@ -1,0 +1,6 @@
+.env
+.python-version
+.vscode
+housekeeping
+__pycache__
+*.pyc

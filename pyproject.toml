@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "pycharity"
+version = "0.1.0"
+description = "A python port of Mikarific's charity bot."
+authors = ["Seon"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+"discord.py" = "^1.7.3"
+aiohttp = "^3.7.4"
+aioify = "^0.4.0"
+discord-py-slash-command = "^2.0.1"
+python-dotenv = "^0.18.0"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
