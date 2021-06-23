@@ -9,6 +9,9 @@ See [discord.py's documentation](https://discordpy.readthedocs.io/en/stable/disc
 * Make sure both `bot` and `application.commands` scopes are selected.
 * Permissions should be set to at least `3154504784`.
 
+### Fill out the .env file
+Rename `env.dist` to `.env` and fill out your application id and secret token.
+
 ### Install dependencies
 Run `poetry install` to install dependencies.
 
