@@ -15,7 +15,7 @@ class Slash(commands.Cog):
         guild_ids=guild_ids,
     )
     async def _board(self, ctx: SlashContext):
-        image = canvas.board
+        image = await canvas.board.render(canvas.palette)
         embed = discord.Embed(title="Board")
         with io.BytesIO() as buffer:
             image.save(buffer, format="png", compression_level=6)

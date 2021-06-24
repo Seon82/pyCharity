@@ -1,10 +1,9 @@
 from urllib.parse import urljoin
 import asyncio
 import aiohttp
-from aioify import aioify
 import numpy as np
-from PIL import Image
 from .utils import hex2rgba_palette
+from .image import PalettizedImage
 
 
 class BadResponseError(Exception):
@@ -40,23 +39,15 @@ class Canvas:
                         return await response.read()
                 raise BadResponseError("Query returned {r.status} code.")
 
-    @aioify
-    def _parse_binary_board(self, data):
-        colors_dict = dict(enumerate(self.palette))
-        colors_dict[255] = (0, 0, 0, 0)
-        sort_idx = list(range(len(colors_dict)))
-        arr = list(data)
-        idx = np.searchsorted(sort_idx, arr, sorter=sort_idx)
-        out = np.asarray(list(colors_dict.values()), dtype=np.uint8)[sort_idx][idx]
-        img = out.reshape((self.info["height"], self.info["width"], 4))
-        return Image.fromarray(img, mode="RGBA")
-
     async def get_board(self):
         """
         Get the current canvas' board image.
         """
         response = await self.query("boarddata?", "binary")
-        board_image = await self._parse_binary_board(response)
+        array = np.asarray(list(response), dtype=np.uint8).reshape(
+            (self.info["height"], self.info["width"])
+        )
+        board_image = PalettizedImage(array)
         return board_image
 
     async def get_users(self):
