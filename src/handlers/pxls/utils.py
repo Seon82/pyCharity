@@ -24,21 +24,14 @@ async def query(url, content_type):
             raise BadResponseError("Query returned {r.status} code.")
 
 
-def hex2rgba_palette(hex_list):
+def hex2rgba(hex_num: str):
     """
-    Convert a list of hex colors to a list of rgba colors.
-    """
-    mapper = lambda c: (*hex_to_rgb(c["value"]), 255)
-    return [mapper(c) for c in hex_list]
-
-
-def hex_to_rgb(hex_num: str):
-    """
-    Convert hex_num to a (R, G, B) tuple containing color components represented\
+    Convert hex_num to a (R, G, B, 255) tuple containing color components represented\
     by integers between 0 and 255.
     :param hex_num: A hex color string with no leading #
     """
-    return tuple(int(hex_num[i : i + 2], 16) for i in (0, 2, 4))
+    rgb = tuple(int(hex_num[i : i + 2], 16) for i in (0, 2, 4))
+    return (*rgb, 255)
 
 
 def cooldown(num_users: int):

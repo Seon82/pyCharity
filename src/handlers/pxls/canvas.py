@@ -1,20 +1,20 @@
 from urllib.parse import urljoin
 import asyncio
 import numpy as np
-from .utils import hex2rgba_palette, query
+from .utils import hex2rgba, query
 from .image import PalettizedImage
 
 
 class Canvas:
     """
     An object meant to store info and
-    manage requests to pxsl.space.
+    manage requests to pxls.space.
     """
 
     def __init__(self, base_url):
         self.base_url = base_url
         self.info = asyncio.run(self.get_info())
-        self.palette = hex2rgba_palette(self.info["palette"])
+        self.palette = [hex2rgba(c["value"]) for c in self.info["palette"]]
         self.board = asyncio.run(self.get_board())
 
     async def query(self, endpoint: str, content_type: str):
