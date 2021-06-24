@@ -1,21 +1,18 @@
-from io import BytesIO
 from typing import Tuple, Dict, List
 from urllib.parse import parse_qs
 from PIL import Image
 import numpy as np
 from aioify import aioify
 from .image import PalettizedImage
-from .utils import query
+from .utils import download_image
 
 
 class Template(PalettizedImage):
-    def __init__(self, array, url, name, ox, oy, owner):
+    def __init__(self, array, url, ox, oy):
         super().__init__(array)
         self.url = url
-        self.name = name
         self.ox = ox
         self.oy = oy
-        self.owner = owner
 
     @classmethod
     async def from_url(cls, url, palette):
@@ -41,8 +38,8 @@ class Template(PalettizedImage):
         :return: A dictionary contaning the template parameters and the stylized template image.
         """
         params = parse_qs(url.split("#", 1)[1])
-        response = await query(params["template"][0], "binary")
-        return params, Image.open(BytesIO(response)).convert("RGBA")
+        image = await download_image(params["template"][0])
+        return params, image
 
     @staticmethod
     @aioify

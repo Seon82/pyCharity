@@ -1,11 +1,11 @@
 import math
+from io import BytesIO
+from PIL import Image
 import aiohttp
 
 
 class BadResponseError(Exception):
     """Raised when response code isn't 200."""
-
-    pass
 
 
 async def query(url, content_type):
@@ -44,3 +44,11 @@ def hex_to_rgb(hex_num: str):
 def cooldown(num_users: int):
     """Get the cooldown when num_users users are online."""
     return 2.5 * math.sqrt(num_users + 11.96) + 6.5
+
+
+async def download_image(url: str) -> Image.Image:
+    """
+    Download an image from a given url as an rgba PIL image.
+    """
+    response = await query(url, "binary")
+    return Image.open(BytesIO(response)).convert("RGBA")
