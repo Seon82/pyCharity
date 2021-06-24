@@ -14,7 +14,7 @@ class Slash(commands.Cog):
     )
     async def _ping(self, ctx: SlashContext):
         latency = self.bot.latency
-        await ctx.send(f"Pong! {latency*1000:.2f}ms")
+        await ctx.send(f"Pong! {round(latency * 1000)} ms")
 
 
 def setup(bot):
