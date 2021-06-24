@@ -1,15 +1,8 @@
 from urllib.parse import urljoin
 import asyncio
-import aiohttp
 import numpy as np
-from .utils import hex2rgba_palette
+from .utils import hex2rgba_palette, query
 from .image import PalettizedImage
-
-
-class BadResponseError(Exception):
-    """Raised when response code isn't 200."""
-
-    pass
 
 
 class Canvas:
@@ -30,14 +23,9 @@ class Canvas:
 
         :param content_type: 'json' or 'binary'
         """
-        async with aiohttp.ClientSession() as session:
-            async with session.get(urljoin(self.base_url, endpoint)) as response:
-                if response.status == 200:
-                    if content_type == "json":
-                        return await response.json()
-                    if content_type == "binary":
-                        return await response.read()
-                raise BadResponseError("Query returned {r.status} code.")
+        return await query(
+            url=urljoin(self.base_url, endpoint), content_type=content_type
+        )
 
     async def get_board(self):
         """

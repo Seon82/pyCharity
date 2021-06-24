@@ -21,3 +21,13 @@ class PalettizedImage:
         img = np.stack(np.vectorize(colors_dict.get)(self.image), axis=-1)
         img = img.astype(np.uint8)
         return Image.fromarray(img, mode="RGBA")
+
+    @property
+    def width(self):
+        """Get the image's width."""
+        return self.image.shape[1]
+
+    @property
+    def height(self):
+        """Get the image's height."""
+        return self.image.shape[0]

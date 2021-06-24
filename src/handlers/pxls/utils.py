@@ -1,4 +1,27 @@
 import math
+import aiohttp
+
+
+class BadResponseError(Exception):
+    """Raised when response code isn't 200."""
+
+    pass
+
+
+async def query(url, content_type):
+    """
+    Send a GET request to the specified url  and return the content of the reponse.
+
+    :param content_type: 'json' or 'binary'
+    """
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            if response.status == 200:
+                if content_type == "json":
+                    return await response.json()
+                if content_type == "binary":
+                    return await response.read()
+            raise BadResponseError("Query returned {r.status} code.")
 
 
 def hex2rgba_palette(hex_list):

@@ -1,8 +1,8 @@
-import io
 import discord
 from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
 from commands import guild_ids, canvas
+from handlers.discord_utils import attach_image
 
 
 class Slash(commands.Cog):
@@ -17,11 +17,7 @@ class Slash(commands.Cog):
     async def _board(self, ctx: SlashContext):
         image = await canvas.board.render(canvas.palette)
         embed = discord.Embed(title="Board")
-        with io.BytesIO() as buffer:
-            image.save(buffer, format="png", compression_level=6)
-            buffer.seek(0)
-            file = discord.File(buffer, filename="board.png")
-            embed.set_image(url="attachment://board.png")
+        file = attach_image(image, embed)
         await ctx.send(file=file, embed=embed)
 
 
