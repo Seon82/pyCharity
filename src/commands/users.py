@@ -1,7 +1,6 @@
 from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
-from handlers.pxls import get_users
-from commands import guild_ids
+from commands import guild_ids, canvas
 
 
 class Slash(commands.Cog):
@@ -14,7 +13,7 @@ class Slash(commands.Cog):
         guild_ids=guild_ids,
     )
     async def _users(self, ctx: SlashContext):
-        users = await get_users()
+        users = await canvas.get_users()
         await ctx.send(f"{users} users currently online.")
 
 

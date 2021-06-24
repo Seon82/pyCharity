@@ -14,7 +14,14 @@ async def on_ready():
     print("Ready!")
 
 
-bot.load_extension("commands.ping")
-bot.load_extension("commands.users")
-bot.load_extension("commands.cooldown")
+# Load cogs
+command_dir = os.listdir(
+    os.path.join(os.path.dirname(os.path.realpath(__file__)), "commands")
+)
+for file in command_dir:
+    if file.endswith(".py") and file != "__init__.py":
+        extension_name = file.replace(".py", "")
+        bot.load_extension(f"commands.{extension_name}")
+        print(f"Loaded {extension_name} command.")
+
 bot.run(os.environ.get("TOKEN"))
