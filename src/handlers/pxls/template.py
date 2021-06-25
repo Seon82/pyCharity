@@ -7,10 +7,9 @@ from .image import PalettizedImage
 from .utils import download_image
 
 
-class Template(PalettizedImage):
-    def __init__(self, array, url, ox, oy):
+class BaseTemplate(PalettizedImage):
+    def __init__(self, array, ox, oy):
         super().__init__(array)
-        self.url = url
         self.ox = ox
         self.oy = oy
 
@@ -23,9 +22,7 @@ class Template(PalettizedImage):
         rendered_image = await cls.detemplatize(styled_image, int(params["tw"][0]))
         palettized_array = await cls.reduce(rendered_image, palette)
         return cls(
-            array=palettized_array,
-            ox=int(params["ox"][0]),
-            oy=int(params["oy"][0]),
+            array=palettized_array, ox=int(params["ox"][0]), oy=int(params["oy"][0])
         )
 
     @staticmethod
@@ -84,3 +81,33 @@ class Template(PalettizedImage):
         # Transparent pixels have code 255
         img[img == len(palette) - 1] = 255
         return img
+
+
+class Template(BaseTemplate):
+    def __init__(self, array, ox, oy, name, url, owner):
+        super().__init__(array, ox, oy)
+        self.name = name
+        self.url = url
+        self.owner = owner
+
+    @classmethod
+    async def from_url(cls, url: str, name: str, owner: int, palette):
+        """
+        Generate a template from a pxls.space url.
+
+        :param url: A pxls.space template link.
+        :param name: The template's name.
+        :param owner: The guild id.
+        :param palette: The canvas' palette.
+        """
+        params, styled_image = await cls.process_link(url)
+        rendered_image = await cls.detemplatize(styled_image, int(params["tw"][0]))
+        palettized_array = await cls.reduce(rendered_image, palette)
+        return cls(
+            array=palettized_array,
+            ox=int(params["ox"][0]),
+            oy=int(params["oy"][0]),
+            name=name,
+            owner=owner,
+            url=url,
+        )

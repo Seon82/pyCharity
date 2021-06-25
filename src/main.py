@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
 bot = commands.Bot(command_prefix="!")
 slash = SlashCommand(bot, sync_commands=True, sync_on_cog_reload=True)
 
@@ -23,5 +24,6 @@ for file in command_dir:
         extension_name = file.replace(".py", "")
         bot.load_extension(f"commands.{extension_name}")
         print(f"Loaded {extension_name} command.")
+
 
 bot.run(os.environ.get("TOKEN"))

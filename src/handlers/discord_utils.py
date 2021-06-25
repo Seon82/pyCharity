@@ -3,6 +3,10 @@ import discord
 from PIL import Image
 
 
+class UserError(Exception):
+    pass
+
+
 def attach_image(
     image: Image.Image, embed: discord.Embed, compression_level: int = 6
 ) -> discord.File:

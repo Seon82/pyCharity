@@ -16,7 +16,7 @@ class Slash(commands.Cog):
     async def _cooldown(self, ctx: SlashContext):
         users = await canvas.get_users()
         current_cooldown = cooldown(users)
-        await ctx.send(f"Cooldown is currently {current_cooldown:.0f}s.")
+        await ctx.send(f"Cooldown is currently {current_cooldown:.0f} s.")
 
 
 def setup(bot):

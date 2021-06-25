@@ -1,4 +1,5 @@
 from discord.ext import commands
+from discord.ext.commands.core import cooldown
 from discord_slash import cog_ext, SlashContext
 from commands import guild_ids
 
@@ -7,11 +8,7 @@ class Slash(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @cog_ext.cog_slash(
-        name="ping",
-        description="Pong!",
-        guild_ids=guild_ids,
-    )
+    @cog_ext.cog_slash(name="ping", description="Pong!", guild_ids=guild_ids)
     async def _ping(self, ctx: SlashContext):
         latency = self.bot.latency
         await ctx.send(f"Pong! {round(latency * 1000)} ms")
