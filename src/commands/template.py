@@ -38,7 +38,7 @@ class Slash(commands.Cog):
         if template_manager.check_name_exists(name, owner=ctx.guild_id):
             raise UserError("A template with this name already exists.")
         template = await Template.from_url(
-            url, name=name, owner=ctx.guild_id, palette=canvas.palette
+            url, name=name, owner=ctx.guild_id, canvas=canvas
         )
         template_manager.add_template(template)
         embed = discord.Embed(

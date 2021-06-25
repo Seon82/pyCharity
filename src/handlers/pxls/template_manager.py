@@ -1,6 +1,7 @@
 from bson.binary import Binary
 import pickle
 import numpy as np
+from aioify import aioify
 from pymongo import MongoClient
 from .template import Template
 

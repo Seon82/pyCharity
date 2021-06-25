@@ -1,8 +1,10 @@
+from os import O_EXCL
 from typing import Tuple, Dict, List
 from urllib.parse import parse_qs
 from PIL import Image
 import numpy as np
 from aioify import aioify
+from handlers.pxls.canvas import Canvas
 from .image import PalettizedImage
 from .utils import download_image
 
@@ -14,16 +16,36 @@ class BaseTemplate(PalettizedImage):
         self.oy = oy
 
     @classmethod
-    async def from_url(cls, url, palette):
+    async def from_url(cls, template_url, canvas, *args, **kwargs):
         """
         Generate a template from a pxls.space url.
         """
-        params, styled_image = await cls.process_link(url)
+        params, styled_image = await cls.process_link(template_url)
         rendered_image = await cls.detemplatize(styled_image, int(params["tw"][0]))
-        palettized_array = await cls.reduce(rendered_image, palette)
-        return cls(
-            array=palettized_array, ox=int(params["ox"][0]), oy=int(params["oy"][0])
-        )
+        palettized_array = await cls.reduce(rendered_image, canvas.palette)
+        ox, oy = int(params["ox"][0]), int(params["oy"][0])
+        palettized_array, ox, oy = cls.crop_to_canvas(palettized_array, ox, oy, canvas)
+        return cls(array=palettized_array, ox=ox, oy=oy, *args, **kwargs)
+
+    @staticmethod
+    def crop_to_canvas(array: np.ndarray, ox: int, oy: int, canvas: Canvas):
+        """
+        Crop a numpy array to the canvas boundaries.
+        """
+        min_x = 0 if ox > 0 else -ox
+        min_y = 0 if oy > 0 else -oy
+        array = array[min_y:, min_x:]
+        x, y = max(0, ox), max(0, oy)
+        if y + array.shape[0] > canvas.board.height:
+            height = canvas.board.height - y
+        else:
+            height = array.shape[0]
+        if x + array.shape[1] > canvas.board.width:
+            width = canvas.board.width - x
+        else:
+            width = array.shape[1]
+        array = array[:height, :width]
+        return array, x, y
 
     @staticmethod
     async def process_link(
@@ -91,7 +113,7 @@ class Template(BaseTemplate):
         self.owner = owner
 
     @classmethod
-    async def from_url(cls, url: str, name: str, owner: int, palette):
+    async def from_url(cls, url: str, canvas: Canvas, name: str, owner: int):
         """
         Generate a template from a pxls.space url.
 
@@ -100,14 +122,10 @@ class Template(BaseTemplate):
         :param owner: The guild id.
         :param palette: The canvas' palette.
         """
-        params, styled_image = await cls.process_link(url)
-        rendered_image = await cls.detemplatize(styled_image, int(params["tw"][0]))
-        palettized_array = await cls.reduce(rendered_image, palette)
-        return cls(
-            array=palettized_array,
-            ox=int(params["ox"][0]),
-            oy=int(params["oy"][0]),
+        return await super().from_url(
+            template_url=url,
+            canvas=canvas,
             name=name,
-            owner=owner,
             url=url,
+            owner=owner,
         )
