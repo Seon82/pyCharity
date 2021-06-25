@@ -14,6 +14,7 @@ class Slash(commands.Cog):
         description="Show current board.",
         guild_ids=guild_ids,
     )
+    @commands.cooldown(1, 10, commands.BucketType.user)
     async def _board(self, ctx: SlashContext):
         image = await canvas.board.render(canvas.palette)
         embed = discord.Embed(title="Board")

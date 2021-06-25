@@ -25,6 +25,8 @@ async def on_slash_command_error(ctx, error):
     title = "❌ Error"
     if isinstance(error, UserError):
         description = error.args[0]
+    elif isinstance(error, commands.errors.CommandOnCooldown):
+        description = f"This command is on cooldown. Please try again in `{error.retry_after:.2f}s`."
     else:
         unexpected = True
         description = "An unexpected error occured. Please contact the bot developer."

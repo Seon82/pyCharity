@@ -25,12 +25,13 @@ class Slash(commands.Cog):
             )
         ],
     )
+    @commands.cooldown(1, 10, commands.BucketType.user)
     async def _reduce(self, ctx: SlashContext, url: str):
         await ctx.defer()
         image = await download_image(url)
         recolored_array = await Template.reduce(image, canvas.palette)
         recolored_image = await PalettizedImage(recolored_array).render(canvas.palette)
-        embed = discord.Embed(title="Reduced image")
+        embed = discord.Embed(title="Reduced!")
         file = attach_image(recolored_image, embed)
         await ctx.send(file=file, embed=embed)
 

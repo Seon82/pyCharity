@@ -32,6 +32,7 @@ class Slash(commands.Cog):
         description="Add a template to the tracker.",
         options=[name_option, url_option],
     )
+    @commands.cooldown(1, 5, commands.BucketType.user)
     async def _add(self, ctx: SlashContext, name: str, url: str):
         await ctx.defer()
         if not utils.check_template_link(url):
@@ -56,6 +57,7 @@ class Slash(commands.Cog):
         description="Remove a template from the tracker.",
         options=[name_option],
     )
+    @commands.cooldown(1, 3, commands.BucketType.user)
     async def _remove(self, ctx: SlashContext, name: str):
         success = template_manager.delete_template(name=name, owner=ctx.guild_id)
         if not success:
@@ -72,6 +74,7 @@ class Slash(commands.Cog):
         guild_ids=guild_ids,
         description="Display all currently tracked templates.",
     )
+    @commands.cooldown(1, 3, commands.BucketType.user)
     async def _list(self, ctx: SlashContext):
         templates = template_manager.get_templates(owner=ctx.guild_id)
         embed = discord.Embed(title="Template list:")
@@ -90,6 +93,7 @@ class Slash(commands.Cog):
         description="Display a template from the tracker.",
         options=[name_option],
     )
+    @commands.cooldown(1, 3, commands.BucketType.user)
     async def _show(self, ctx: SlashContext, name: str):
         await ctx.defer()
         template = template_manager.get_template(name=name, owner=ctx.guild_id)
