@@ -45,3 +45,13 @@ async def download_image(url: str) -> Image.Image:
     """
     response = await query(url, "binary")
     return Image.open(BytesIO(response)).convert("RGBA")
+
+
+def check_template_link(url):
+    """
+    Make sure the template link has a valid format.
+    """
+    for elmt in ["://", "ox", "oy", "template", "tw"]:
+        if not elmt in url:
+            return False
+    return True

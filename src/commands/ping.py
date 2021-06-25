@@ -1,5 +1,4 @@
 from discord.ext import commands
-from discord.ext.commands.core import cooldown
 from discord_slash import cog_ext, SlashContext
 from commands import guild_ids
 

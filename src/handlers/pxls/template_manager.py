@@ -1,7 +1,6 @@
-from bson.binary import Binary
 import pickle
+from bson.binary import Binary
 import numpy as np
-from aioify import aioify
 from pymongo import MongoClient
 from .template import Template
 
@@ -42,7 +41,14 @@ class TemplateManager:
         if document is None:
             return None
         array = self.deserialize(document.pop("image"))
-        return Template(array=array, **document)
+        return Template(
+            array=array,
+            ox=document["ox"],
+            oy=document["oy"],
+            name=document["name"],
+            url=document["url"],
+            owner=document["owner"],
+        )
 
     def check_name_exists(self, name, **query):
         """
@@ -59,7 +65,14 @@ class TemplateManager:
         """
         for document in self.collection.find(query, {"_id": False}):
             array = self.deserialize(document.pop("image"))
-            yield Template(array=array, **document)
+            yield Template(
+                array=array,
+                ox=document["ox"],
+                oy=document["oy"],
+                name=document["name"],
+                url=document["url"],
+                owner=document["owner"],
+            )
 
     def delete_template(self, **query):
         """

@@ -1,11 +1,10 @@
 import discord
 from discord.ext import commands
-from discord.message import Message
 from discord_slash import cog_ext, SlashContext
 from discord_slash.utils.manage_commands import create_option
 from commands import guild_ids, canvas, template_manager
 from handlers.discord_utils import attach_image, UserError
-from handlers.pxls import Template
+from handlers.pxls import Template, utils
 
 url_option = create_option(
     name="url",
@@ -35,6 +34,8 @@ class Slash(commands.Cog):
     )
     async def _add(self, ctx: SlashContext, name: str, url: str):
         await ctx.defer()
+        if not utils.check_template_link(url):
+            raise UserError("Please provide a valid template link.")
         if template_manager.check_name_exists(name, owner=ctx.guild_id):
             raise UserError("A template with this name already exists.")
         template = await Template.from_url(

@@ -1,4 +1,3 @@
-from os import O_EXCL
 from typing import Tuple, Dict, List
 from urllib.parse import parse_qs
 from PIL import Image

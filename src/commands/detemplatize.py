@@ -3,8 +3,8 @@ from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
 from discord_slash.utils.manage_commands import create_option
 from commands import guild_ids
-from handlers.discord_utils import attach_image
-from handlers.pxls import Template
+from handlers.discord_utils import attach_image, UserError
+from handlers.pxls import Template, utils
 
 
 class Slash(commands.Cog):
@@ -26,6 +26,8 @@ class Slash(commands.Cog):
     )
     async def _detemplatize(self, ctx: SlashContext, url: str):
         await ctx.defer()
+        if not utils.check_template_link(url):
+            raise UserError("Please provide a valid template link.")
         params, styled_image = await Template.process_link(url)
         original_image = await Template.detemplatize(styled_image, int(params["tw"][0]))
         embed = discord.Embed(title="Detemplatized image")
