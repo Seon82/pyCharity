@@ -7,6 +7,7 @@ if len(guild_id) > 0:
 else:  # Empty string
     guild_ids = None
 
+embed_color = int(os.getenv("EMBED_COLOR"), 16)
 base_url = os.getenv("PXLS_URL")
 canvas = Canvas(base_url=base_url)
 

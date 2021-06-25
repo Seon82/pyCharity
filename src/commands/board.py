@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
-from commands import guild_ids, canvas
+from commands import guild_ids, canvas, embed_color
 from handlers.discord_utils import attach_image
 
 
@@ -17,7 +17,7 @@ class Slash(commands.Cog):
     @commands.cooldown(1, 10, commands.BucketType.user)
     async def _board(self, ctx: SlashContext):
         image = await canvas.board.render(canvas.palette)
-        embed = discord.Embed(title="Board")
+        embed = discord.Embed(title="Board", color=embed_color)
         file = attach_image(image, embed)
         await ctx.send(file=file, embed=embed)
 

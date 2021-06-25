@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
 from discord_slash.utils.manage_commands import create_option
-from commands import guild_ids, canvas, template_manager
+from commands import guild_ids, canvas, template_manager, embed_color
 from handlers.discord_utils import attach_image, UserError
 from handlers.pxls import Template, utils
 
@@ -44,7 +44,9 @@ class Slash(commands.Cog):
         )
         template_manager.add_template(template)
         embed = discord.Embed(
-            title=name, description=f"[{template.url}]({template.url})"
+            title=name,
+            description=f"[{template.url}]({template.url})",
+            color=embed_color,
         )
         template_img = await template.render(canvas.palette)
         file = attach_image(template_img, embed)
@@ -65,6 +67,7 @@ class Slash(commands.Cog):
         embed = discord.Embed(
             title="Deleted!",
             description=f"Successfully deleted {name} from the tracker.",
+            color=embed_color,
         )
         await ctx.send(embed=embed)
 
@@ -77,7 +80,7 @@ class Slash(commands.Cog):
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def _list(self, ctx: SlashContext):
         templates = template_manager.get_templates(owner=ctx.guild_id)
-        embed = discord.Embed(title="Template list:")
+        embed = discord.Embed(title="Template list:", color=embed_color)
         for template in templates:
             embed.add_field(
                 name=template.name,
@@ -100,7 +103,9 @@ class Slash(commands.Cog):
         if template is None:
             raise UserError("Invalid template name.")
         embed = discord.Embed(
-            title=name, description=f"[{template.url}]({template.url})"
+            title=name,
+            description=f"[{template.url}]({template.url})",
+            color=embed_color,
         )
         template_img = await template.render(canvas.palette)
         file = attach_image(template_img, embed)

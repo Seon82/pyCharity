@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
-from commands import guild_ids
+from commands import guild_ids, embed_color
 
 
 class Slash(commands.Cog):
@@ -15,6 +15,7 @@ class Slash(commands.Cog):
         embed = discord.Embed(
             title="🏓 Pong!",
             description=f"{self.bot.user.name}'s ping is `{round(latency * 1000)} ms`.",
+            color=embed_color,
         )
         await ctx.send(embed=embed)
 

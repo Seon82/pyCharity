@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
 from discord_slash.utils.manage_commands import create_option
-from commands import guild_ids, canvas
+from commands import guild_ids, canvas, embed_color
 from handlers.discord_utils import attach_image
 from handlers.pxls import Template, PalettizedImage
 from handlers.pxls.utils import download_image
@@ -31,7 +31,7 @@ class Slash(commands.Cog):
         image = await download_image(url)
         recolored_array = await Template.reduce(image, canvas.palette)
         recolored_image = await PalettizedImage(recolored_array).render(canvas.palette)
-        embed = discord.Embed(title="Reduced!")
+        embed = discord.Embed(title="Reduced!", color=embed_color)
         file = attach_image(recolored_image, embed)
         await ctx.send(file=file, embed=embed)
 
