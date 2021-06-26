@@ -1,0 +1,15 @@
+services:
+
+    mongo:
+        image: mongo
+        volumes:
+            - mongo:/data/db
+
+    discord_bot:
+        build:
+            context: .
+        env_file:
+            - ./.env
+    
+volumes:
+    mongo:
