@@ -21,7 +21,9 @@ class BaseTemplate(PalettizedImage):
         """
         params, styled_image = await cls.process_link(template_url)
         rendered_image = await cls.detemplatize(styled_image, int(params["tw"][0]))
+        print("rendered image", hash(np.array(rendered_image).tobytes()))
         palettized_array = await cls.reduce(rendered_image, canvas.palette)
+        print("palettized array", hash(palettized_array.tobytes()))
         ox, oy = int(params["ox"][0]), int(params["oy"][0])
         palettized_array, ox, oy = cls.crop_to_canvas(palettized_array, ox, oy, canvas)
         return cls(array=palettized_array, ox=ox, oy=oy, *args, **kwargs)
@@ -94,6 +96,7 @@ class BaseTemplate(PalettizedImage):
         Colors that aren't in the palette are automatically mappped to their
         nearest equivalent.
         """
+        palette = palette.copy()
         rendered_array = np.asarray(rendered_image)
         palette.append((0, 0, 0, 0))
         img = np.linalg.norm(
@@ -101,7 +104,7 @@ class BaseTemplate(PalettizedImage):
         ).argmin(axis=0)
         # Transparent pixels have code 255
         img[img == len(palette) - 1] = 255
-        return img
+        return img.astype(np.uint8)
 
 
 class Template(BaseTemplate):
