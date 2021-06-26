@@ -37,15 +37,17 @@ class Slash(commands.Cog):
         await ctx.defer()
         if not utils.check_template_link(url):
             raise UserError("Please provide a valid template link.")
-        if template_manager.check_name_exists(name, owner=ctx.guild_id):
+        # Check if a template with the same name not owned by the user running the command exists.
+        if template_manager.check_name_exists(name, owner={"$ne": ctx.author_id}):
             raise UserError("A template with this name already exists.")
         template = await Template.from_url(
-            url, name=name, owner=ctx.guild_id, canvas=canvas
+            url, name=name, owner=ctx.author_id, canvas=canvas
         )
         template_manager.add_template(template)
+        owner = await self.bot.fetch_user(template.owner)
         embed = discord.Embed(
             title=name,
-            description=f"[{template.url}]({template.url})",
+            description=f"**Owner:** {owner.name}#{owner.discriminator}\n**Link:** {template.url}",
             color=embed_color,
         )
         template_img = await template.render(canvas.palette)
@@ -61,7 +63,7 @@ class Slash(commands.Cog):
     )
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def _remove(self, ctx: SlashContext, name: str):
-        success = template_manager.delete_template(name=name, owner=ctx.guild_id)
+        success = template_manager.delete_template(name=name, owner=ctx.author_id)
         if not success:
             raise UserError("Invalid template name.")
         embed = discord.Embed(
@@ -79,12 +81,13 @@ class Slash(commands.Cog):
     )
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def _list(self, ctx: SlashContext):
-        templates = template_manager.get_templates(owner=ctx.guild_id)
+        template_info = template_manager.find(projection={"image": False})
         embed = discord.Embed(title="Template list:", color=embed_color)
-        for template in templates:
+        for info in template_info:
+            owner = await self.bot.fetch_user(info["owner"])
             embed.add_field(
-                name=template.name,
-                value=f"[{template.url}]({template.url})",
+                name=info["name"],
+                value=f"Owner: {owner.name}#{owner.discriminator}\nLink: {info['url']}",
                 inline=False,
             )
         await ctx.send(embed=embed)
@@ -99,12 +102,13 @@ class Slash(commands.Cog):
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def _show(self, ctx: SlashContext, name: str):
         await ctx.defer()
-        template = template_manager.get_template(name=name, owner=ctx.guild_id)
+        template = template_manager.get_template(name=name)
         if template is None:
             raise UserError("Invalid template name.")
+        owner = await self.bot.fetch_user(template.owner)
         embed = discord.Embed(
             title=name,
-            description=f"[{template.url}]({template.url})",
+            description=f"**Owner:** {owner.name}#{owner.discriminator}\n**Link:** {template.url}",
             color=embed_color,
         )
         template_img = await template.render(canvas.palette)

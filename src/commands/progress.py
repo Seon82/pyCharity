@@ -31,9 +31,7 @@ class Slash(commands.Cog):
         if utils.check_template_link(template_name):
             template = await BaseTemplate.from_url(template_name, canvas)
         else:
-            template = template_manager.get_template(
-                name=template_name, owner=ctx.guild_id
-            )
+            template = template_manager.get_template(name=template_name)
             if template is None:
                 raise UserError(f"{template_name} isn't a valid template name.")
         progress_array, (completed_pixels, total_pixels) = await utils.progress(

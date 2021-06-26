@@ -59,6 +59,13 @@ class TemplateManager:
             return True
         return False
 
+    def find(self, projection, **query):
+        """
+        Get a generator returning data from an arbitrary find query.
+        """
+        for document in self.collection.find(query, projection):
+            yield document
+
     def get_templates(self, **query):
         """
         Get a generator returning templates in the database matching the query.
