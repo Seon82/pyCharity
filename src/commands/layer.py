@@ -4,8 +4,7 @@ from discord_slash import cog_ext, SlashContext
 from discord_slash.utils.manage_commands import create_option
 from commands import guild_ids, canvas, embed_color, template_manager
 from handlers.discord_utils import UserError, attach_image
-from handlers.pxls.template import BaseTemplate
-from handlers.pxls import utils
+from handlers.pxls import utils, BaseTemplate
 
 
 class Slash(commands.Cog):

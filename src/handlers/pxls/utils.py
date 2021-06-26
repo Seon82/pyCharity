@@ -80,3 +80,29 @@ def layer(canvas_width: int, canvas_height: int, *templates) -> PalettizedImage:
         max_x = max(ox + template.width, max_x)
         max_y = max(oy + template.height, max_y)
     return PalettizedImage(background[min_y:max_y, min_x:max_x])
+
+
+@aioify
+def progress(canvas, template):
+    """
+    Measure the completion of a template.
+
+    :return: (progress_array, (completed_pixels, total_pixels).
+    progress_array is a np.ndarray containing 1 where the template pixels are correct on
+    the canvas and 0 elsewhere.
+    completed_pixels in the amound of completed non-transparent pixels, and total_pixels
+    the total number of non-transparent pixels the template contains.
+    """
+    ox, oy = template.ox, template.oy
+    canvas_section = canvas.board.image[
+        oy : oy + template.height, ox : ox + template.width
+    ]
+    template_transparent = template.image == 255
+    canvas_transparent = canvas_section == 255
+    mask = np.logical_or(template_transparent, canvas_transparent)
+    progress_array = (canvas_section == template.image).astype(np.uint8)
+    progress_array[mask] = 255
+    transparent_num = np.count_nonzero(mask)
+    completed_pixels = np.count_nonzero(progress_array) - transparent_num
+    total_pixels = canvas_section.size - transparent_num
+    return progress_array, (completed_pixels, total_pixels)
