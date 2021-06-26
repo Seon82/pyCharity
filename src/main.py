@@ -49,5 +49,8 @@ for file in command_dir:
         bot.load_extension(f"commands.{extension_name}")
         print(f"Loaded {extension_name} command.")
 
+# Load clock
+bot.load_extension("handlers.clock")
+print("Loaded clock.")
 
 bot.run(os.environ.get("TOKEN"))
