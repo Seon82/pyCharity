@@ -20,8 +20,7 @@ class Canvas:
         """
         Make initial requests to pxls.space.
         """
-        self.info = await self.fetch_info()
-        self.palette = [hex2rgba(c["value"]) for c in self.info["palette"]]
+        await self.update_info()
         self.board = await self.fetch_board()
 
     async def query(self, endpoint: str, content_type: str):
@@ -50,7 +49,7 @@ class Canvas:
         response_json = await self.query("users", "json")
         return response_json["count"]
 
-    async def fetch_info(self):
-        """Get the canvas info."""
-        info = await self.query("info", "json")
-        return info
+    async def update_info(self):
+        """Update the canvas info, and update the palette."""
+        self.info = await self.query("info", "json")
+        self.palette = [hex2rgba(c["value"]) for c in self.info["palette"]]

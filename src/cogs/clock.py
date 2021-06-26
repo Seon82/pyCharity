@@ -13,6 +13,7 @@ class Clock(commands.Cog):
     @tasks.loop(minutes=2)
     async def update_board(self):
         try:
+            await canvas.update_info()
             canvas.board = await canvas.fetch_board()
             print("Board updated.")
         except Exception as e:

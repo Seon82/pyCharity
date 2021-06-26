@@ -106,11 +106,12 @@ class BaseTemplate(PalettizedImage):
 
 
 class Template(BaseTemplate):
-    def __init__(self, array, ox, oy, name, url, owner):
+    def __init__(self, array, ox, oy, name, url, canvas_code, owner):
         super().__init__(array, ox, oy)
         self.name = name
         self.url = url
         self.owner = owner
+        self.canvas_code = canvas_code
 
     @classmethod
     async def from_url(cls, url: str, canvas: Canvas, name: str, owner: int):
@@ -118,9 +119,9 @@ class Template(BaseTemplate):
         Generate a template from a pxls.space url.
 
         :param url: A pxls.space template link.
+        :param canvas: The template's canvas.
         :param name: The template's name.
         :param owner: The guild id.
-        :param palette: The canvas' palette.
         """
         return await super().from_url(
             template_url=url,
@@ -128,4 +129,5 @@ class Template(BaseTemplate):
             name=name,
             url=url,
             owner=owner,
+            canvas_code=canvas.info["canvasCode"],
         )

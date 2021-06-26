@@ -12,7 +12,7 @@ class Events(commands.Cog):
         print("Ready!")
 
     @commands.Cog.listener()
-    async def on_slash_command_error(ctx, error):
+    async def on_slash_command_error(_, ctx, error):
         """Error message handler."""
         unexpected = False
         title = "❌ Error"

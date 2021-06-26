@@ -38,7 +38,9 @@ class Slash(commands.Cog):
         if not utils.check_template_link(url):
             raise UserError("Please provide a valid template link.")
         # Check if a template with the same name not owned by the user running the command exists.
-        if await template_manager.check_name_exists(name, owner={"$ne": ctx.author_id}):
+        if await template_manager.check_name_exists(
+            name, owner={"$ne": ctx.author_id}, canvas_code=canvas.info["canvasCode"]
+        ):
             raise UserError("A template with this name already exists.")
         template = await Template.from_url(
             url, name=name, owner=ctx.author_id, canvas=canvas
@@ -63,7 +65,9 @@ class Slash(commands.Cog):
     )
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def _remove(self, ctx: SlashContext, name: str):
-        success = await template_manager.delete_template(name=name, owner=ctx.author_id)
+        success = await template_manager.delete_template(
+            name=name, owner=ctx.author_id, canvas_code=canvas.info["canvasCode"]
+        )
         if not success:
             raise UserError("Invalid template name.")
         embed = discord.Embed(
@@ -81,7 +85,9 @@ class Slash(commands.Cog):
     )
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def _list(self, ctx: SlashContext):
-        template_info = template_manager.find(projection={"image": False})
+        template_info = template_manager.find(
+            projection={"image": False}, canvas_code=canvas.info["canvasCode"]
+        )
         embed = discord.Embed(title="Global templates", color=EMBED_COLOR)
         async for info in template_info:
             owner = await self.bot.fetch_user(info["owner"])
@@ -102,7 +108,9 @@ class Slash(commands.Cog):
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def _show(self, ctx: SlashContext, name: str):
         await ctx.defer()
-        template = await template_manager.get_template(name=name)
+        template = await template_manager.get_template(
+            name=name, canvas_code=canvas.info["canvasCode"]
+        )
         if template is None:
             raise UserError("Invalid template name.")
         owner = await self.bot.fetch_user(template.owner)

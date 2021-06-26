@@ -18,6 +18,21 @@ class TemplateManager:
     def deserialize(data: Binary) -> np.ndarray:
         return pickle.loads(data)
 
+    def doc2template(self, document):
+        """
+        Convert a document to a template.
+        """
+        array = self.deserialize(document["image"])
+        return Template(
+            array=array,
+            ox=document["ox"],
+            oy=document["oy"],
+            name=document["name"],
+            canvas_code=document["canvas_code"],
+            url=document["url"],
+            owner=document["owner"],
+        )
+
     async def add_template(self, template: Template):
         """
         Add a template to the database.
@@ -25,6 +40,7 @@ class TemplateManager:
         data = {
             "name": template.name,
             "owner": template.owner,
+            "canvas_code": template.canvas_code,
             "ox": template.ox,
             "oy": template.oy,
             "url": template.url,
@@ -37,18 +53,10 @@ class TemplateManager:
         Find a template in the database matching the query.
         ex: self.get_template(name='Seon', owner=123456789)
         """
-        document = await self.collection.find_one(query, {"_id": False})
+        document = await self.collection.find_one(query)
         if document is None:
             return None
-        array = self.deserialize(document.pop("image"))
-        return Template(
-            array=array,
-            ox=document["ox"],
-            oy=document["oy"],
-            name=document["name"],
-            url=document["url"],
-            owner=document["owner"],
-        )
+        return self.doc2template(document)
 
     async def check_name_exists(self, name, **query):
         """
@@ -70,16 +78,8 @@ class TemplateManager:
         """
         Get a generator returning templates in the database matching the query.
         """
-        async for document in self.collection.find(query, {"_id": False}):
-            array = self.deserialize(document.pop("image"))
-            yield Template(
-                array=array,
-                ox=document["ox"],
-                oy=document["oy"],
-                name=document["name"],
-                url=document["url"],
-                owner=document["owner"],
-            )
+        async for document in self.collection.find(query):
+            yield self.doc2template(document)
 
     async def delete_template(self, **query):
         """

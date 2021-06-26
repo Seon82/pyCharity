@@ -33,7 +33,9 @@ class Slash(commands.Cog):
             if utils.check_template_link(template_name):
                 template = await BaseTemplate.from_url(template_name, canvas)
             else:
-                template = await template_manager.get_template(name=template_name)
+                template = await template_manager.get_template(
+                    name=template_name, canvas_code=canvas.info["canvasCode"]
+                )
                 if template is None:
                     raise UserError(f"{template_name} isn't a valid template name.")
             templates.append(template)
