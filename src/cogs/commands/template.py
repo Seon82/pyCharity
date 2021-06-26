@@ -82,7 +82,7 @@ class Slash(commands.Cog):
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def _list(self, ctx: SlashContext):
         template_info = template_manager.find(projection={"image": False})
-        embed = discord.Embed(title="Template list:", color=EMBED_COLOR)
+        embed = discord.Embed(title="Global templates", color=EMBED_COLOR)
         async for info in template_info:
             owner = await self.bot.fetch_user(info["owner"])
             embed.add_field(
