@@ -16,7 +16,7 @@ class Slash(commands.Cog):
     )
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def _cooldown(self, ctx: SlashContext):
-        users = await canvas.get_users()
+        users = await canvas.fetch_users()
         current_cooldown = cooldown(users)
         embed = discord.Embed(
             title="⏳ Cooldown info",

@@ -13,9 +13,9 @@ class Canvas:
 
     def __init__(self, base_url):
         self.base_url = base_url
-        self.info = asyncio.run(self.get_info())
+        self.info = asyncio.run(self.fetch_info())
         self.palette = [hex2rgba(c["value"]) for c in self.info["palette"]]
-        self.board = asyncio.run(self.get_board())
+        self.board = asyncio.run(self.fetch_board())
 
     async def query(self, endpoint: str, content_type: str):
         """
@@ -27,7 +27,7 @@ class Canvas:
             url=urljoin(self.base_url, endpoint), content_type=content_type
         )
 
-    async def get_board(self):
+    async def fetch_board(self):
         """
         Get the current canvas' board image.
         """
@@ -38,12 +38,12 @@ class Canvas:
         board_image = PalettizedImage(array)
         return board_image
 
-    async def get_users(self):
+    async def fetch_users(self):
         """Get the number of online users."""
         response_json = await self.query("users", "json")
         return response_json["count"]
 
-    async def get_info(self):
+    async def fetch_info(self):
         """Get the canvas info."""
         info = await self.query("info", "json")
         return info

@@ -14,7 +14,7 @@ class Slash(commands.Cog):
     )
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def _users(self, ctx: SlashContext):
-        users = await canvas.get_users()
+        users = await canvas.fetch_users()
         await ctx.send(f"{users} users currently online.")
 
 
