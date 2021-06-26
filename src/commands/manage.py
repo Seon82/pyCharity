@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
 from discord_slash.utils.manage_commands import create_option
-from commands import guild_ids, canvas, template_manager, embed_color
+from main import GUILD_IDS, canvas, template_manager, EMBED_COLOR
 from handlers.discord_utils import attach_image, UserError
 from handlers.pxls import Template, utils
 
@@ -29,7 +29,7 @@ class Slash(commands.Cog):
         base="manage",
         subcommand_group="template",
         name="add",
-        guild_ids=guild_ids,
+        guild_ids=GUILD_IDS,
         description="Add a template to the tracker.",
         options=[name_option, url_option],
     )
@@ -47,7 +47,7 @@ class Slash(commands.Cog):
         embed = discord.Embed(
             title=name,
             description=f"[{template.url}]({template.url})",
-            color=embed_color,
+            color=EMBED_COLOR,
         )
         template_img = await template.render(canvas.palette)
         file = attach_image(template_img, embed)
@@ -57,7 +57,7 @@ class Slash(commands.Cog):
         base="manage",
         subcommand_group="template",
         name="remove",
-        guild_ids=guild_ids,
+        guild_ids=GUILD_IDS,
         description="Remove a template from the tracker.",
         options=[name_option],
     )
@@ -69,7 +69,7 @@ class Slash(commands.Cog):
         embed = discord.Embed(
             title="Deleted!",
             description=f"Successfully deleted {name} from the tracker.",
-            color=embed_color,
+            color=EMBED_COLOR,
         )
         await ctx.send(embed=embed)
 

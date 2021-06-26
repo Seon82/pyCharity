@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
 from discord_slash.utils.manage_commands import create_option
-from commands import guild_ids, canvas, embed_color
+from main import GUILD_IDS, canvas, EMBED_COLOR
 from handlers.discord_utils import attach_image
 from handlers.pxls import Template, PalettizedImage
 from handlers.pxls.utils import download_image
@@ -15,7 +15,7 @@ class Slash(commands.Cog):
     @cog_ext.cog_slash(
         name="reduce",
         description="Colorize an image to fit pxls' palette.",
-        guild_ids=guild_ids,
+        guild_ids=GUILD_IDS,
         options=[
             create_option(
                 name="url",
@@ -31,7 +31,7 @@ class Slash(commands.Cog):
         image = await download_image(url)
         recolored_array = await Template.reduce(image, canvas.palette)
         recolored_image = await PalettizedImage(recolored_array).render(canvas.palette)
-        embed = discord.Embed(title="Reduced!", color=embed_color)
+        embed = discord.Embed(title="Reduced!", color=EMBED_COLOR)
         file = attach_image(recolored_image, embed)
         await ctx.send(file=file, embed=embed)
 

@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
 from discord_slash.utils.manage_commands import create_option
-from commands import guild_ids, embed_color
+from main import GUILD_IDS, EMBED_COLOR
 from handlers.discord_utils import attach_image, UserError
 from handlers.pxls import Template, utils
 
@@ -14,7 +14,7 @@ class Slash(commands.Cog):
     @cog_ext.cog_slash(
         name="detemplatize",
         description="Get the origin image from a template.",
-        guild_ids=guild_ids,
+        guild_ids=GUILD_IDS,
         options=[
             create_option(
                 name="url",
@@ -30,7 +30,7 @@ class Slash(commands.Cog):
             raise UserError("Please provide a valid template link.")
         params, styled_image = await Template.process_link(url)
         original_image = await Template.detemplatize(styled_image, int(params["tw"][0]))
-        embed = discord.Embed(title="Detemplatized image", color=embed_color)
+        embed = discord.Embed(title="Detemplatized image", color=EMBED_COLOR)
         file = attach_image(original_image, embed)
         await ctx.send(file=file, embed=embed)
 

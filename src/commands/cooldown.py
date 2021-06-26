@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
-from commands import guild_ids, canvas, embed_color
+from main import GUILD_IDS, canvas, EMBED_COLOR
 from handlers.pxls.utils import cooldown
 
 
@@ -12,7 +12,7 @@ class Slash(commands.Cog):
     @cog_ext.cog_slash(
         name="cooldown",
         description="Get current cooldown.",
-        guild_ids=guild_ids,
+        guild_ids=GUILD_IDS,
     )
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def _cooldown(self, ctx: SlashContext):
@@ -21,7 +21,7 @@ class Slash(commands.Cog):
         embed = discord.Embed(
             title="⏳ Cooldown info",
             description=f"Cooldown is currently {round(current_cooldown)}s.",
-            color=embed_color,
+            color=EMBED_COLOR,
         )
         await ctx.send(embed=embed)
 

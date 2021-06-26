@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
 from discord_slash.utils.manage_commands import create_option
-from commands import guild_ids, canvas, embed_color, template_manager
+from main import GUILD_IDS, canvas, EMBED_COLOR, template_manager
 from handlers.discord_utils import UserError, attach_image
 from handlers.pxls import utils, BaseTemplate, PalettizedImage
 
@@ -14,7 +14,7 @@ class Slash(commands.Cog):
     @cog_ext.cog_slash(
         name="progress",
         description="Check a template's progress.",
-        guild_ids=guild_ids,
+        guild_ids=GUILD_IDS,
         options=[
             create_option(
                 name=f"template",
@@ -42,7 +42,7 @@ class Slash(commands.Cog):
         )
         description = f"{100*completed_pixels/total_pixels:.1f}% complete ({completed_pixels}/{total_pixels} pixels)."
         embed = discord.Embed(
-            title="Progress", description=description, color=embed_color
+            title="Progress", description=description, color=EMBED_COLOR
         )
         file = attach_image(image, embed)
         await ctx.send(file=file, embed=embed)

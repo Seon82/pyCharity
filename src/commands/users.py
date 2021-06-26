@@ -1,6 +1,6 @@
 from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
-from commands import guild_ids, canvas
+from main import GUILD_IDS, canvas
 
 
 class Slash(commands.Cog):
@@ -10,7 +10,7 @@ class Slash(commands.Cog):
     @cog_ext.cog_slash(
         name="users",
         description="Get number of online users",
-        guild_ids=guild_ids,
+        guild_ids=GUILD_IDS,
     )
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def _users(self, ctx: SlashContext):

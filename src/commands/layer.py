@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
 from discord_slash.utils.manage_commands import create_option
-from commands import guild_ids, canvas, embed_color, template_manager
+from main import GUILD_IDS, canvas, EMBED_COLOR, template_manager
 from handlers.discord_utils import UserError, attach_image
 from handlers.pxls import utils, BaseTemplate
 
@@ -14,7 +14,7 @@ class Slash(commands.Cog):
     @cog_ext.cog_slash(
         name="layer",
         description="Combine multiple templates",
-        guild_ids=guild_ids,
+        guild_ids=GUILD_IDS,
         options=[
             create_option(
                 name=f"template{i}",
@@ -41,7 +41,7 @@ class Slash(commands.Cog):
             canvas.board.width, canvas.board.height, *templates
         )
         image = await palettized_image.render(canvas.palette)
-        embed = discord.Embed(title="Layered!", color=embed_color)
+        embed = discord.Embed(title="Layered!", color=EMBED_COLOR)
         file = attach_image(image, embed)
         await ctx.send(file=file, embed=embed)
 
