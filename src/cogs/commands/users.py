@@ -1,6 +1,7 @@
+import discord
 from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
-from main import GUILD_IDS, canvas
+from main import GUILD_IDS, canvas, EMBED_COLOR
 
 
 class Slash(commands.Cog):
@@ -15,7 +16,12 @@ class Slash(commands.Cog):
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def _users(self, ctx: SlashContext):
         users = await canvas.fetch_users()
-        await ctx.send(f"{users} users currently online.")
+        embed = discord.Embed(
+            title="Users",
+            description=f"{users} users currently online.",
+            color=EMBED_COLOR,
+        )
+        await ctx.send(embed=embed)
 
 
 def setup(bot):
