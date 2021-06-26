@@ -1,13 +1,13 @@
 import pickle
 from bson.binary import Binary
 import numpy as np
-from pymongo import MongoClient
+from motor.motor_asyncio import AsyncIOMotorClient
 from .template import Template
 
 
 class TemplateManager:
     def __init__(self, mongo_uri: str):
-        mongo_client = MongoClient(mongo_uri)
+        mongo_client = AsyncIOMotorClient(mongo_uri)
         self.collection = mongo_client.pycharity.templates
 
     @staticmethod
@@ -18,7 +18,7 @@ class TemplateManager:
     def deserialize(data: Binary) -> np.ndarray:
         return pickle.loads(data)
 
-    def add_template(self, template: Template):
+    async def add_template(self, template: Template):
         """
         Add a template to the database.
         """
@@ -30,14 +30,14 @@ class TemplateManager:
             "url": template.url,
             "image": self.serialize(template.image),
         }
-        self.collection.insert_one(data)
+        await self.collection.insert_one(data)
 
-    def get_template(self, **query) -> Template:
+    async def get_template(self, **query) -> Template:
         """
         Find a template in the database matching the query.
         ex: self.get_template(name='Seon', owner=123456789)
         """
-        document = self.collection.find_one(query, {"_id": False})
+        document = await self.collection.find_one(query, {"_id": False})
         if document is None:
             return None
         array = self.deserialize(document.pop("image"))
@@ -50,27 +50,27 @@ class TemplateManager:
             owner=document["owner"],
         )
 
-    def check_name_exists(self, name, **query):
+    async def check_name_exists(self, name, **query):
         """
         Check if a template name already exists.
         """
         query["name"] = name
-        if self.collection.find_one(query, {"image": False}):
+        if await self.collection.find_one(query, {"image": False}):
             return True
         return False
 
-    def find(self, projection, **query):
+    async def find(self, projection, **query):
         """
         Get a generator returning data from an arbitrary find query.
         """
-        for document in self.collection.find(query, projection):
+        async for document in self.collection.find(query, projection):
             yield document
 
-    def get_templates(self, **query):
+    async def get_templates(self, **query):
         """
         Get a generator returning templates in the database matching the query.
         """
-        for document in self.collection.find(query, {"_id": False}):
+        async for document in self.collection.find(query, {"_id": False}):
             array = self.deserialize(document.pop("image"))
             yield Template(
                 array=array,
@@ -81,8 +81,9 @@ class TemplateManager:
                 owner=document["owner"],
             )
 
-    def delete_template(self, **query):
+    async def delete_template(self, **query):
         """
         Delete a template from the database.
         """
-        return self.collection.delete_one(query).deleted_count > 0
+        result = await self.collection.delete_one(query)
+        return result.deleted_count > 0
