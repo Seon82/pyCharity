@@ -5,6 +5,10 @@ from main import EMBED_COLOR
 
 
 class Events(commands.Cog):
+    """
+    A cog used a an event listener.
+    """
+
     def __init__(self, bot):
         self.bot = bot
         self.welcome_message = (
@@ -31,7 +35,7 @@ class Events(commands.Cog):
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
-        """Send a presentation message"""
+        """Send a presentation message."""
         print(f"Joined new guild: {guild.name}")
         channels = guild.text_channels
         filtered_channels = [

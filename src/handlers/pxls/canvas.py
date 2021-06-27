@@ -33,7 +33,7 @@ class Canvas:
             url=urljoin(self.base_url, endpoint), content_type=content_type
         )
 
-    async def fetch_board(self):
+    async def fetch_board(self) -> PalettizedImage:
         """
         Get the current canvas' board image.
         """
@@ -44,12 +44,12 @@ class Canvas:
         board_image = PalettizedImage(array)
         return board_image
 
-    async def fetch_users(self):
+    async def fetch_users(self) -> int:
         """Get the number of online users."""
         response_json = await self.query("users", "json")
         return response_json["count"]
 
-    async def update_info(self):
+    async def update_info(self) -> None:
         """Update the canvas info, and update the palette."""
         self.info = await self.query("info", "json")
         self.palette = [hex2rgba(c["value"]) for c in self.info["palette"]]

@@ -7,7 +7,7 @@ from handlers.discord_utils import attach_image, UserError
 from handlers.pxls import Template, utils
 
 
-class Slash(commands.Cog):
+class Detemplatize(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -36,4 +36,4 @@ class Slash(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Slash(bot))
+    bot.add_cog(Detemplatize(bot))

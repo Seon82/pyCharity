@@ -5,16 +5,20 @@ from aioify import aioify
 
 class PalettizedImage:
     """
-    A quantized image.
+    A object used to represent a quantized image in a memory-efficient format.
+    At its core, this object is a numpy array containing the indexes of colors.
     """
 
     def __init__(self, array):
         self.image = array
 
     @aioify
-    def render(self, palette):
+    def render(self, palette: list) -> Image.Image:
         """
         Convert the quantized image to a PIL rgba image.
+        Any color index present in the palettized image but not referenced in the array will be mapped to (0,0,0,0).
+
+        :param palette: The palette used to render.
         """
         colors_dict = dict(enumerate(palette))
         colors_dict[255] = (0, 0, 0, 0)

@@ -6,23 +6,33 @@ from .template import Template
 
 
 class TemplateManager:
+    """
+    An helper used to ease interactions with the templates stored
+    in the mongodb databse.
+    """
+
     def __init__(self, mongo_uri: str):
+        """
+        :param mongo_uri: The mongodb's uri, ie: mongodb://127.0.0.1:27017/
+        """
         mongo_client = AsyncIOMotorClient(mongo_uri)
         self.collection = mongo_client.pycharity.templates
 
     @staticmethod
-    def serialize(array: np.ndarray) -> Binary:
+    def _serialize(array: np.ndarray) -> Binary:
+        """Convert a numpy array to a binary blob."""
         return Binary(pickle.dumps(array, protocol=2), subtype=128)
 
     @staticmethod
-    def deserialize(data: Binary) -> np.ndarray:
+    def _deserialize(data: Binary) -> np.ndarray:
+        """Retrieve a numpy array from a binary blob."""
         return pickle.loads(data)
 
-    def doc2template(self, document):
+    def _doc2template(self, document):
         """
         Convert a document to a template.
         """
-        array = self.deserialize(document["image"])
+        array = self._deserialize(document["image"])
         return Template(
             array=array,
             ox=document["ox"],
@@ -46,7 +56,7 @@ class TemplateManager:
             "ox": template.ox,
             "oy": template.oy,
             "url": template.url,
-            "image": self.serialize(template.image),
+            "image": self._serialize(template.image),
         }
         await self.collection.insert_one(data)
 
@@ -58,7 +68,7 @@ class TemplateManager:
         document = await self.collection.find_one(query)
         if document is None:
             return None
-        return self.doc2template(document)
+        return self._doc2template(document)
 
     async def check_name_exists(self, name, **query):
         """
@@ -87,7 +97,7 @@ class TemplateManager:
         Get a generator returning templates in the database matching the query.
         """
         async for document in self.collection.find(query):
-            yield self.doc2template(document)
+            yield self._doc2template(document)
 
     async def delete_template(self, **query):
         """

@@ -33,7 +33,7 @@ faction_option = create_option(
 )
 
 
-class Slash(commands.Cog):
+class Template(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -157,4 +157,4 @@ class Slash(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Slash(bot))
+    bot.add_cog(Template(bot))

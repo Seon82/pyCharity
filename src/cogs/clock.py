@@ -3,6 +3,11 @@ from main import canvas
 
 
 class Clock(commands.Cog):
+    """
+    A class used to manage background periodic tasks.
+    Is used to update the canvas object periodically.
+    """
+
     def __init__(self, bot):
         self.bot = bot
         self.update_board.start()
@@ -12,6 +17,7 @@ class Clock(commands.Cog):
 
     @tasks.loop(minutes=2)
     async def update_board(self):
+        """Update the canvas info periodically."""
         try:
             await canvas.update_info()
             canvas.board = await canvas.fetch_board()

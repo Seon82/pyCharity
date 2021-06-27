@@ -4,7 +4,7 @@ from discord_slash import cog_ext, SlashContext
 from main import GUILD_IDS, EMBED_COLOR
 
 
-class Slash(commands.Cog):
+class Help(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.help = {
@@ -39,4 +39,4 @@ class Slash(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Slash(bot))
+    bot.add_cog(Help(bot))

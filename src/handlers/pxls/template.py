@@ -9,13 +9,18 @@ from .utils import download_image
 
 
 class BaseTemplate(PalettizedImage):
+    """
+    A low-level object meant to represent the essential information
+    contained in a template.
+    """
+
     def __init__(self, array, ox, oy):
         super().__init__(array)
         self.ox = ox
         self.oy = oy
 
     @classmethod
-    async def from_url(cls, template_url, canvas, *args, **kwargs):
+    async def from_url(cls, template_url: str, canvas: Canvas, *args, **kwargs):
         """
         Generate a template from a pxls.space url.
         """
@@ -27,9 +32,13 @@ class BaseTemplate(PalettizedImage):
         return cls(array=palettized_array, ox=ox, oy=oy, *args, **kwargs)
 
     @staticmethod
-    def crop_to_canvas(array: np.ndarray, ox: int, oy: int, canvas: Canvas):
+    def crop_to_canvas(
+        array: np.ndarray, ox: int, oy: int, canvas: Canvas
+    ) -> Tuple[np.ndarray, int, int]:
         """
         Crop a numpy array to the canvas boundaries.
+
+        :return: array, x, y -> array is the cropped array, and x and y the new ox and oy values.
         """
         min_x = 0 if ox > 0 else -ox
         min_y = 0 if oy > 0 else -oy
@@ -106,7 +115,31 @@ class BaseTemplate(PalettizedImage):
 
 
 class Template(BaseTemplate):
-    def __init__(self, array, ox, oy, name, url, canvas_code, owner, scope):
+    """
+    An object made to represent a template from the tracker.
+    """
+
+    def __init__(
+        self,
+        array: np.ndarray,
+        ox: int,
+        oy: int,
+        name: str,
+        url: str,
+        canvas_code: str,
+        owner: int,
+        scope: str,
+    ):
+        """
+        :param array: A palettized array representing the template image.
+        :ox: The x position of the template's top-left corner on the canvas.
+        :param oy: The y position of the template's top-left corner on the canvas.
+        :param name: The template's name.
+        :param url: A pxls.space link to the original template.
+        :param canavs_code: The canvas this template belong to.
+        :param owner: The id of the faction or user owning this template.
+        :param scope: The type of the owner: 'faction'|'user'
+        """
         super().__init__(array, ox, oy)
         self.name = name
         self.url = url

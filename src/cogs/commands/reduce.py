@@ -8,7 +8,7 @@ from handlers.pxls import Template, PalettizedImage
 from handlers.pxls.utils import download_image
 
 
-class Slash(commands.Cog):
+class Reduce(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -37,4 +37,4 @@ class Slash(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Slash(bot))
+    bot.add_cog(Reduce(bot))

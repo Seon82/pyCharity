@@ -5,7 +5,7 @@ from main import GUILD_IDS, canvas, EMBED_COLOR
 from handlers.pxls.utils import cooldown
 
 
-class Slash(commands.Cog):
+class Cooldown(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -27,4 +27,4 @@ class Slash(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Slash(bot))
+    bot.add_cog(Cooldown(bot))
