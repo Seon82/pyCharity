@@ -24,3 +24,31 @@ def attach_image(
         file = discord.File(buffer, filename="image.png")
         embed.set_image(url="attachment://image.png")
     return file
+
+
+async def get_owner_name(scope, owner_id, bot):
+    """
+    Get the owner's name.
+    """
+    if scope == "user":
+        owner = await bot.fetch_user(owner_id)
+        owner_name = f"{owner.name}#{owner.discriminator}"
+    else:
+        owner = await bot.fetch_guild(owner_id)
+        owner_name = owner.name
+    return owner_name
+
+
+async def template_preview(template, bot, canvas, embed_color):
+    """
+    Generate an template preview embed.
+    """
+    owner_name = await get_owner_name(template.scope, template.owner, bot)
+    embed = discord.Embed(
+        title=template.name,
+        description=f"**Owner:** {owner_name}\n**Link:** {template.url}",
+        color=embed_color,
+    )
+    template_img = await template.render(canvas.palette)
+    file = attach_image(template_img, embed)
+    return file, embed

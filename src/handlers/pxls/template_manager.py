@@ -31,6 +31,7 @@ class TemplateManager:
             canvas_code=document["canvas_code"],
             url=document["url"],
             owner=document["owner"],
+            scope=document["scope"],
         )
 
     async def add_template(self, template: Template):
@@ -40,6 +41,7 @@ class TemplateManager:
         data = {
             "name": template.name,
             "owner": template.owner,
+            "scope": template.scope,
             "canvas_code": template.canvas_code,
             "ox": template.ox,
             "oy": template.oy,
@@ -67,12 +69,18 @@ class TemplateManager:
             return True
         return False
 
-    async def find(self, projection, **query):
+    async def find(self, projection={}, **query):
         """
         Get a generator returning data from an arbitrary find query.
         """
         async for document in self.collection.find(query, projection):
             yield document
+
+    async def find_one(self, projection={}, **query):
+        """
+        Get the data from an arbitrary find query.
+        """
+        return await self.collection.find_one(query, projection)
 
     async def get_templates(self, **query):
         """

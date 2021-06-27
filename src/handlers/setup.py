@@ -8,9 +8,9 @@ async def setup():
     Initialize objects.
     """
     load_dotenv()
-    guild_id = os.getenv("TEST_GUILD_ID", "")
-    if len(guild_id) > 0:
-        guild_ids = [int(guild_id)]
+    guild_ids = os.getenv("TEST_GUILD_ID", "")
+    if len(guild_ids) > 0:
+        guild_ids = [int(id) for id in guild_ids.split(",")]
     else:  # Empty string
         guild_ids = None
 
