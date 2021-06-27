@@ -1,6 +1,7 @@
 import os
 from handlers.pxls import Canvas, TemplateManager
 from dotenv import load_dotenv
+from handlers.websocket import WebsocketClient
 
 
 async def setup():
@@ -21,4 +22,7 @@ async def setup():
 
     template_manager = TemplateManager(os.getenv("DB_CONNECTION"))
 
-    return guild_ids, canvas, template_manager, embed_color
+    ws_client = WebsocketClient(uri=os.getenv("PXLS_WEBSOCKET"), canvas=canvas)
+    ws_client.start()
+
+    return guild_ids, canvas, template_manager, ws_client, embed_color

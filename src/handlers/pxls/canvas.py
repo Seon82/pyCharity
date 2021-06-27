@@ -44,6 +44,12 @@ class Canvas:
         board_image = PalettizedImage(array)
         return board_image
 
+    def update_pixel(self, x: int, y: int, color: int):
+        """
+        Update a pixel's value on the board.
+        """
+        self.board.image[y, x] = color
+
     async def fetch_users(self) -> int:
         """Get the number of online users."""
         response_json = await self.query("users", "json")

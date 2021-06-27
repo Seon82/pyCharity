@@ -1,5 +1,5 @@
 from discord.ext import tasks, commands
-from main import canvas
+from main import canvas, ws_client
 
 
 class Clock(commands.Cog):
@@ -15,13 +15,16 @@ class Clock(commands.Cog):
     def cog_unload(self):
         self.update_board.cancel()
 
-    @tasks.loop(minutes=2)
+    @tasks.loop(minutes=5)
     async def update_board(self):
         """Update the canvas info periodically."""
         try:
             await canvas.update_info()
-            canvas.board = await canvas.fetch_board()
+            ws_client.pause()
+            board = await canvas.fetch_board()
+            canvas.board = board
             print("Board updated.")
+            ws_client.resume()
         except Exception as e:
             print("Error while fetching board.", e)
 
