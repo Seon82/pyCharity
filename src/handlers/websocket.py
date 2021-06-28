@@ -29,12 +29,6 @@ class WebsocketClient:
     def resume(self):
         self._paused = False
 
-    @staticmethod
-    def _wait(var: bool):
-        """Wait for var to become true."""
-        while not var:
-            pass
-
     async def _listen(self):
         while True:
             try:

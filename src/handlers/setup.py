@@ -13,6 +13,7 @@ async def setup():
     if len(guild_ids) > 0:
         guild_ids = [int(id) for id in guild_ids.split(",")]
     else:  # Empty string
+        print("No guild id specified: commands will be updated globally")
         guild_ids = None
 
     embed_color = int(os.getenv("EMBED_COLOR"), 16)

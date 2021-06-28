@@ -3,12 +3,7 @@ from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
 from discord_slash.utils.manage_commands import create_option
 from main import GUILD_IDS, canvas, template_manager, EMBED_COLOR
-from handlers.discord_utils import (
-    get_owner_name,
-    UserError,
-    template_preview,
-    attach_image,
-)
+from handlers.discord_utils import get_owner_name, UserError, template_preview
 from handlers.pxls import Template, utils
 
 url_option = create_option(
@@ -76,7 +71,7 @@ class Template(commands.Cog):
     )
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def _remove(self, ctx: SlashContext, name: str):
-        # Faster query by only fetching the metadata and not the image
+        # Only fetch the metadata and not the image
         template_info = await template_manager.find_one(
             name=name, projection={"image": False}
         )
@@ -114,6 +109,7 @@ class Template(commands.Cog):
         embed = discord.Embed(color=EMBED_COLOR)
         faction_description = ""
         global_description = ""
+        # Only fetch the metadata and not the image
         template_info = template_manager.find(
             projection={"image": False}, canvas_code=canvas.info["canvasCode"]
         )
