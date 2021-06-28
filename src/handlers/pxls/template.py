@@ -74,9 +74,9 @@ class BaseTemplate(PalettizedImage):
         """
         Convert a styled template image back to its original version.
         """
-        block_size = img_raw.width // true_width
-        if true_width == -1 or block_size == 1:  # Nothing to do :)
+        if true_width <= 0 or img_raw.width // true_width == 1:  # Nothing to do :)
             return img_raw
+        block_size = img_raw.width // true_width
         img_raw = np.asarray(img_raw)
 
         blocks = img_raw.reshape(
