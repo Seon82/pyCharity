@@ -1,6 +1,6 @@
 .env
 .python-version
 .vscode
-housekeeping
+.idea
 __pycache__
 *.pyc
