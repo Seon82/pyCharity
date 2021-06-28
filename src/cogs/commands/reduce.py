@@ -8,7 +8,7 @@ from handlers.pxls import Template, PalettizedImage
 from handlers.pxls.utils import download_image
 
 
-class Reduce(commands.Cog):
+class ReduceCommand(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -37,4 +37,4 @@ class Reduce(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Reduce(bot))
+    bot.add_cog(ReduceCommand(bot))

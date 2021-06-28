@@ -16,7 +16,8 @@ class PalettizedImage:
     def render(self, palette: list) -> Image.Image:
         """
         Convert the quantized image to a PIL rgba image.
-        Any color index present in the palettized image but not referenced in the array will be mapped to (0,0,0,0).
+        Any color index present in the palettized image but \
+        not referenced in the array will be mapped to (0,0,0,0).
 
         :param palette: The palette used to render.
         """

@@ -7,7 +7,7 @@ from handlers.discord_utils import UserError, attach_image
 from handlers.pxls import utils, BaseTemplate, PalettizedImage
 
 
-class Progress(commands.Cog):
+class ProgressCommand(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -51,4 +51,4 @@ class Progress(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Progress(bot))
+    bot.add_cog(ProgressCommand(bot))

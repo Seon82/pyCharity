@@ -7,7 +7,7 @@ from handlers.discord_utils import attach_image, UserError
 from handlers.pxls import Template, utils
 
 
-class Detemplatize(commands.Cog):
+class DetemplatizeCommand(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -36,4 +36,4 @@ class Detemplatize(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Detemplatize(bot))
+    bot.add_cog(DetemplatizeCommand(bot))

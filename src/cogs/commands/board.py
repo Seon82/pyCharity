@@ -5,7 +5,7 @@ from handlers.setup import GUILD_IDS, canvas, EMBED_COLOR
 from handlers.discord_utils import attach_image
 
 
-class Board(commands.Cog):
+class BoardCommand(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -23,4 +23,4 @@ class Board(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Board(bot))
+    bot.add_cog(BoardCommand(bot))

@@ -1,8 +1,7 @@
 import asyncio
-from os import stat
-import websockets
 import json
 import threading
+import websockets
 
 
 class WebsocketClient:

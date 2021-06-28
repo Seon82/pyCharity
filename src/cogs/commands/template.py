@@ -28,7 +28,7 @@ faction_option = create_option(
 )
 
 
-class Template(commands.Cog):
+class TemplateCommand(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -153,4 +153,4 @@ class Template(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Template(bot))
+    bot.add_cog(TemplateCommand(bot))

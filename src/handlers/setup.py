@@ -1,8 +1,7 @@
 import os
-import os
 import asyncio
-from handlers.pxls import Canvas, TemplateManager
 from dotenv import load_dotenv
+from handlers.pxls import Canvas, TemplateManager
 from handlers.websocket import WebsocketClient
 
 

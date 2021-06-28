@@ -7,7 +7,7 @@ from handlers.discord_utils import UserError, attach_image
 from handlers.pxls import utils, BaseTemplate
 
 
-class Layer(commands.Cog):
+class LayerCommand(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -49,4 +49,4 @@ class Layer(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Layer(bot))
+    bot.add_cog(LayerCommand(bot))

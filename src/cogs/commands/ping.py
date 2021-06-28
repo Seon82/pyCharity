@@ -4,7 +4,7 @@ from discord_slash import cog_ext, SlashContext
 from handlers.setup import GUILD_IDS, EMBED_COLOR
 
 
-class Ping(commands.Cog):
+class PingCommand(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -21,4 +21,4 @@ class Ping(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Ping(bot))
+    bot.add_cog(PingCommand(bot))
