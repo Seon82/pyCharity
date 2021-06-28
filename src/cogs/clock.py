@@ -1,5 +1,8 @@
+import logging
 from discord.ext import tasks, commands
 from handlers.setup import canvas, ws_client
+
+logger = logging.getLogger("pyCharity." + __name__)
 
 
 class Clock(commands.Cog):
@@ -23,14 +26,14 @@ class Clock(commands.Cog):
             ws_client.pause()
             board = await canvas.fetch_board()
             canvas.board = board
-            print("Board updated.")
+            logger.debug("Board updated.")
             ws_client.resume()
         except Exception as e:
-            print("Error while fetching board.", e)
+            logger.warning("Error while fetching board.", e)
 
     @update_board.before_loop
     async def before(self):
-        print("Clock is waiting...")
+        logger.debug("Clock is waiting...")
         await self.bot.wait_until_ready()
 
 

@@ -1,4 +1,5 @@
 import io
+import importlib
 import discord
 from PIL import Image
 

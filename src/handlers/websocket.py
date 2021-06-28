@@ -1,7 +1,11 @@
 import asyncio
+import logging
 import json
 import threading
 import websockets
+
+
+logger = logging.getLogger("pyCharity." + __name__)
 
 
 class WebsocketClient:
@@ -32,7 +36,7 @@ class WebsocketClient:
         while True:
             try:
                 async with websockets.connect(self.uri) as websocket:
-                    print("Connected to websocket.")
+                    logger.info("Connected to websocket.")
                     async for message in websocket:
                         while self._paused:
                             pass
@@ -42,7 +46,7 @@ class WebsocketClient:
                                 for update in data["pixels"]:
                                     self.canvas.update_pixel(**update)
                         except Exception as e:
-                            print("Websocket client raised", e)
+                            logger.warning("Websocket client raised", e)
             except Exception as e:
-                print(f"Websocket disconected: {e}")
-                print("Attempting reconnect...")
+                logger.warning(f"Websocket disconnected: {e}")
+                logger.info("Attempting reconnect...")

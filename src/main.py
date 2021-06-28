@@ -1,7 +1,13 @@
 import os
 from discord.ext import commands
 from discord_slash import SlashCommand
+from handlers import logging_formatter
 
+
+# Create root logger
+logger = logging_formatter.root_logger("pyCharity", level="DEBUG")
+
+# Create bot
 bot = commands.Bot(command_prefix="!")
 slash = SlashCommand(bot, sync_commands=True, sync_on_cog_reload=True)
 
@@ -14,11 +20,11 @@ for file in command_dir:
     if file.endswith(".py") and file != "__init__.py":
         extension_name = file.replace(".py", "")
         bot.load_extension(f"cogs.commands.{extension_name}")
-        print(f"Loaded {extension_name} command.")
+        logger.debug(f"Loaded {extension_name} command.")
 
 # Load other cogs
 for cog in ["clock", "event_listener"]:
     bot.load_extension(f"cogs.{cog}")
-    print(f"Loaded {cog}.")
+    logger.debug(f"Loaded {cog}.")
 
 bot.run(os.environ.get("TOKEN"))

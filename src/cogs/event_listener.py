@@ -1,7 +1,10 @@
+import logging
 import discord
 from discord.ext import commands
 from handlers.discord_utils import UserError
 from handlers.setup import EMBED_COLOR
+
+logger = logging.getLogger("pyCharity." + __name__)
 
 
 class Events(commands.Cog):
@@ -34,12 +37,12 @@ class Events(commands.Cog):
         await self.bot.change_presence(
             activity=discord.CustomActivity("Counting pixels")
         )
-        print("Ready!")
+        logger.info("Ready!")
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
         """Send a presentation message."""
-        print(f"Joined new guild: {guild.name}")
+        logger.info(f"Joined new guild: {guild.name}")
         channels = guild.text_channels
         filtered_channels = [
             c for c in channels if c.permissions_for(c.guild.me).send_messages
@@ -73,6 +76,10 @@ class Events(commands.Cog):
         embed = discord.Embed(title=title, description=description, color=0xCC0000)
         await ctx.send(embed=embed)
         if unexpected:
+            logger.error(
+                f"An error has occured in server '{ctx.message.guild.name}' while running: "
+                f"/{ctx.command} {ctx.subcommand_name if ctx.subcommand_name else ''}"
+            )
             raise error
 
 

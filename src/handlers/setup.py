@@ -1,11 +1,12 @@
 import os
 import asyncio
+import logging
 from dotenv import load_dotenv
 from handlers.pxls import Canvas, TemplateManager
 from handlers.websocket import WebsocketClient
 
-
-print("Setting up...")
+logger = logging.getLogger("pyCharity." + __name__)
+logger.info("Setting up...")
 load_dotenv()
 
 # Guild_ids
