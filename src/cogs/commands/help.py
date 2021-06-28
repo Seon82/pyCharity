@@ -29,7 +29,7 @@ class HelpCommand(commands.Cog):
     async def _help(self, ctx: SlashContext):
         embed = discord.Embed(
             title="Command help",
-            description="\n".join(desc for desc in self.help.values()),
+            description="\n".join("• " + desc for desc in self.help.values()),
             color=EMBED_COLOR,
         )
         embed.set_footer(
