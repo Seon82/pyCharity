@@ -31,6 +31,9 @@ class Events(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
+        await self.bot.change_presence(
+            activity=discord.CustomActivity("Counting pixels")
+        )
         print("Ready!")
 
     @commands.Cog.listener()
