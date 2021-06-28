@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
 from discord_slash.utils.manage_commands import create_option
-from main import GUILD_IDS, canvas, EMBED_COLOR, template_manager
+from handlers.setup import GUILD_IDS, canvas, EMBED_COLOR, template_manager
 from handlers.discord_utils import UserError, attach_image
 from handlers.pxls import utils, BaseTemplate, PalettizedImage
 

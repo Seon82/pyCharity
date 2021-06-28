@@ -1,14 +1,6 @@
 import os
-import asyncio
 from discord.ext import commands
 from discord_slash import SlashCommand
-from handlers.setup import setup
-
-# Get global variables
-loop = asyncio.get_event_loop()
-GUILD_IDS, canvas, template_manager, ws_client, EMBED_COLOR = loop.run_until_complete(
-    setup()
-)
 
 bot = commands.Bot(command_prefix="!")
 slash = SlashCommand(bot, sync_commands=True, sync_on_cog_reload=True)

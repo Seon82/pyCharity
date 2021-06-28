@@ -1,5 +1,5 @@
 from discord.ext import tasks, commands
-from main import canvas, ws_client
+from handlers.setup import canvas, ws_client
 
 
 class Clock(commands.Cog):

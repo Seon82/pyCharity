@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from handlers.discord_utils import UserError
-from main import EMBED_COLOR
+from handlers.setup import EMBED_COLOR
 
 
 class Events(commands.Cog):

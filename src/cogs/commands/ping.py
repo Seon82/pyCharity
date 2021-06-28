@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
-from main import GUILD_IDS, EMBED_COLOR
+from handlers.setup import GUILD_IDS, EMBED_COLOR
 
 
 class Ping(commands.Cog):
