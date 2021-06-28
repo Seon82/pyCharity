@@ -1,6 +1,6 @@
 # pyCharity
 
-A python port of [Mikarific's Charity bot](https://github.com/Mikarific/Charity), a discord bot with information and progress for pxls.space factions.
+A discord bot with information and template tracking for pxls.space. Inspired by [Mikarific's Charity bot](https://github.com/Mikarific/Charity).
 
 ## Installation
 
