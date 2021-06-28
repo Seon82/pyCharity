@@ -106,12 +106,19 @@ class BaseTemplate(PalettizedImage):
         palette = palette.copy()
         rendered_array = np.asarray(rendered_image)
         palette.append((0, 0, 0, 0))
-        img = np.linalg.norm(
-            np.stack([rendered_array - c for c in palette]), axis=-1
-        ).argmin(axis=0)
+        palette = np.array(palette, dtype=np.uint8)
+        # Don't try to vectorize this, using np.stack and argmin
+        # uses a crazy amount of memory and is a tad slower on real images.
+        best_match_idx = np.zeros(rendered_array.shape[:2], dtype=np.uint8)
+        best_match_dist = np.full(rendered_array.shape[:2], 500)  # 500<sqrt(3*255^2)
+        for idx, c in enumerate(palette):
+            color_distance = np.linalg.norm(rendered_array - c, axis=-1)
+            closer_mask = color_distance < best_match_dist
+            best_match_dist[closer_mask] = color_distance[closer_mask]
+            best_match_idx[closer_mask] = idx
         # Transparent pixels have code 255
-        img[img == len(palette) - 1] = 255
-        return img.astype(np.uint8)
+        best_match_idx[best_match_idx == len(palette) - 1] = 255
+        return best_match_idx
 
 
 class Template(BaseTemplate):
