@@ -46,8 +46,9 @@ async def template_preview(template, bot, canvas, embed_color):
     owner_name = await get_owner_name(template.scope, template.owner, bot)
     embed = discord.Embed(
         title=template.name,
-        description=f"**Owner:** {owner_name}\n**Link:** {template.url}",
+        description=f"**Owner:** {owner_name}",
         color=embed_color,
+        url=template.url,
     )
     template_img = await template.render(canvas.palette)
     file = attach_image(template_img, embed)

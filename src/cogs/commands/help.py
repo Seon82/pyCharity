@@ -20,6 +20,7 @@ class HelpCommand(commands.Cog):
             "template remove": "`/template remove <name>`: Remove one of your templates from the tracker.",
             "template list": "`/template list`: Show all templates in the global tracker! When run on a server, also highlights the server's templates to make it easy to see what they're working on.",
             "template show": "`/template view <name>`: Display a preview of a template from the tracker.",
+            "template update": "`/template update <name> <url>`: Change the link for a template already in the tracker.",
         }
 
     @cog_ext.cog_slash(

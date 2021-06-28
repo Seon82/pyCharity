@@ -44,9 +44,9 @@ class TemplateManager:
             scope=document["scope"],
         )
 
-    async def add_template(self, template: Template):
+    def _template2doc(self, template: Template):
         """
-        Add a template to the database.
+        Convert a template to a document.
         """
         data = {
             "name": template.name,
@@ -58,7 +58,21 @@ class TemplateManager:
             "url": template.url,
             "image": self._serialize(template.image),
         }
+        return data
+
+    async def add_template(self, template: Template):
+        """
+        Add a template to the database.
+        """
+        data = self._template2doc(template)
         await self.collection.insert_one(data)
+
+    async def update_template(self, template: Template):
+        """
+        Update a template from the database.
+        """
+        data = self._template2doc(template)
+        await self.collection.update_one({"name": template.name}, {"$set": data})
 
     async def get_template(self, **query) -> Template:
         """

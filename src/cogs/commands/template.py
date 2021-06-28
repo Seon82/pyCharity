@@ -44,6 +44,8 @@ class TemplateCommand(commands.Cog):
         await ctx.defer()
         if not utils.check_template_link(url):
             raise UserError("Please provide a valid template link.")
+        if faction and not ctx.guild:
+            raise UserError("Faction templates cannot be added in DMs.")
         if faction and not ctx.author.guild_permissions.manage_guild:
             raise UserError(
                 "You do not have the permission to manage faction templates."
@@ -64,6 +66,33 @@ class TemplateCommand(commands.Cog):
 
     @cog_ext.cog_subcommand(
         base="template",
+        name="update",
+        guild_ids=GUILD_IDS,
+        description="Change the link for a template already in the tracker.",
+        options=[name_option, url_option],
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def _update(self, ctx: SlashContext, name: str, url: str):
+        await ctx.defer()
+        if not utils.check_template_link(url):
+            raise UserError("Please provide a valid template link.")
+        template_info = await template_manager.find_one(
+            name=name, projection={"image": False}
+        )
+        self._check_permissions(ctx, template_info)
+        template = await Template.from_url(
+            url,
+            name=name,
+            owner=template_info["owner"],
+            canvas=canvas,
+            scope=template_info["scope"],
+        )
+        await template_manager.update_template(template)
+        file, embed = await template_preview(template, self.bot, canvas, EMBED_COLOR)
+        await ctx.send(file=file, embed=embed)
+
+    @cog_ext.cog_subcommand(
+        base="template",
         name="remove",
         guild_ids=GUILD_IDS,
         description="Remove a template from the tracker.",
@@ -75,21 +104,11 @@ class TemplateCommand(commands.Cog):
         template_info = await template_manager.find_one(
             name=name, projection={"image": False}
         )
-        if template_info is None:
-            raise UserError("Invalid template name.")
-        scope, owner = template_info["scope"], template_info["owner"]
-        if scope == "faction" and ctx.guild is None:
-            raise UserError(f"This faction template can't be managed from DMs.")
-        if scope == "faction" and ctx.guild.id != owner:
-            raise UserError(f"This template doesn't belong to this server.")
-        if scope == "faction" and not ctx.author.guild_permissions.manage_guild:
-            raise UserError(
-                "You do not have the permission to manage faction templates."
-            )
-        if scope == "user" and ctx.author.id != owner:
-            raise UserError("This template doesn't belong to you.")
+        self._check_permissions(ctx, template_info)
         success = await template_manager.delete_template(
-            name=name, owner=owner, canvas_code=canvas.info["canvasCode"]
+            name=name,
+            owner=template_info["owner"],
+            canvas_code=canvas.info["canvasCode"],
         )
         if not success:
             raise UserError("Deletion failed. Please contact the bot developer.")
@@ -108,6 +127,7 @@ class TemplateCommand(commands.Cog):
     )
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def _list(self, ctx: SlashContext):
+        await ctx.defer()
         embed = discord.Embed(color=EMBED_COLOR)
         faction_description = ""
         global_description = ""
@@ -156,6 +176,29 @@ class TemplateCommand(commands.Cog):
             raise UserError("Invalid template name.")
         file, embed = await template_preview(template, self.bot, canvas, EMBED_COLOR)
         await ctx.send(file=file, embed=embed)
+
+    def _check_permissions(self, ctx: SlashContext, template_info: dict):
+        """
+        Check whether a user has permissions over a template.
+        Raises a UserError if they don't, returns None otherwise.
+
+        :param ctx: The author's command SlashContext.
+        :param template_info: A dictionary containing
+        at least 'owner' and 'scope' information.
+        """
+        if template_info is None:
+            raise UserError("Invalid template name.")
+        scope, owner = template_info["scope"], template_info["owner"]
+        if scope == "faction" and ctx.guild is None:
+            raise UserError(f"A faction template can't be managed from DMs.")
+        if scope == "faction" and ctx.guild.id != owner:
+            raise UserError(f"This template doesn't belong to this server.")
+        if scope == "faction" and not ctx.author.guild_permissions.manage_guild:
+            raise UserError(
+                "You do not have the permission to manage faction templates."
+            )
+        if scope == "user" and ctx.author.id != owner:
+            raise UserError("This template doesn't belong to you.")
 
 
 def setup(bot):
