@@ -77,7 +77,7 @@ class Events(commands.Cog):
         await ctx.send(embed=embed)
         if unexpected:
             logger.error(
-                f"An error has occured in server '{ctx.message.guild.name}' while running: "
+                f"An error has occured while running: "
                 f"/{ctx.command} {ctx.subcommand_name if ctx.subcommand_name else ''}"
             )
             raise error
