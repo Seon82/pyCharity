@@ -78,6 +78,8 @@ class TemplateCommand(commands.Cog):
         if template_info is None:
             raise UserError("Invalid template name.")
         scope, owner = template_info["scope"], template_info["owner"]
+        if scope == "faction" and ctx.guild is None:
+            raise UserError(f"This faction template can't be managed from DMs.")
         if scope == "faction" and ctx.guild.id != owner:
             raise UserError(f"This template doesn't belong to this server.")
         if scope == "faction" and not ctx.author.guild_permissions.manage_guild:
@@ -116,7 +118,11 @@ class TemplateCommand(commands.Cog):
         async for info in template_info:
             owner_name = await get_owner_name(info["scope"], info["owner"], self.bot)
             description = f"• **[{info['name']}]({info['url']})**, by {owner_name}\n"
-            if info["scope"] == "faction" and info["owner"] == ctx.guild.id:
+            if (
+                ctx.guild  # None if we're in DMs
+                and info["scope"] == "faction"
+                and info["owner"] == ctx.guild.id
+            ):
                 faction_description += description
             else:
                 global_description += description
