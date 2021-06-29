@@ -1,10 +1,12 @@
 import discord
+import asyncio
 from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
 from discord_slash.utils.manage_commands import create_option
+from discord_slash.utils import manage_components
 from handlers.setup import GUILD_IDS, canvas, template_manager, EMBED_COLOR
-from handlers.discord_utils import get_owner_name, UserError, template_preview
-from handlers.pxls import Template, utils
+from handlers.discord_utils import get_owner_name, UserError, template_preview, button
+from handlers.pxls import Template, BaseTemplate, utils
 
 url_option = create_option(
     name="url",
@@ -20,13 +22,6 @@ name_option = create_option(
     required=True,
 )
 
-faction_option = create_option(
-    name="faction",
-    description="Make the template a faction template.",
-    option_type=5,
-    required=False,
-)
-
 
 class TemplateCommand(commands.Cog):
     def __init__(self, bot):
@@ -37,32 +32,44 @@ class TemplateCommand(commands.Cog):
         name="add",
         guild_ids=GUILD_IDS,
         description="Add a template to the tracker.",
-        options=[name_option, url_option, faction_option],
+        options=[name_option, url_option],
     )
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def _add(self, ctx: SlashContext, name: str, url: str, faction: bool = False):
+    async def _add(self, ctx: SlashContext, name: str, url: str):
         await ctx.defer()
         if not utils.check_template_link(url):
             raise UserError("Please provide a valid template link.")
-        if faction and not ctx.guild:
-            raise UserError("Faction templates cannot be added in DMs.")
-        if faction and not ctx.author.guild_permissions.manage_guild:
-            raise UserError(
-                "You do not have the permission to manage faction templates."
-            )
         # Check if a template with the same name exists.
         if await template_manager.check_name_exists(
             name, canvas_code=canvas.info["canvasCode"]
         ):
             raise UserError("A template with this name already exists.")
-        scope = "faction" if faction else "user"
-        owner = ctx.guild if scope == "faction" else ctx.author
-        template = await Template.from_url(
-            url, name=name, owner=owner.id, canvas=canvas, scope=scope
+        base_template = await BaseTemplate.from_url(url, canvas=canvas)
+        buttons = [button("Global template", "user")]
+        if ctx.guild and ctx.author.guild_permissions.manage_guild:
+            buttons.append(button("Faction template", "faction"))
+        action_row = manage_components.create_actionrow(*buttons)
+        msg = await ctx.send(
+            f"Ready to add {name} to the tracker! What kind of template is it?",
+            components=[action_row],
+        )
+        try:
+            button_ctx = await manage_components.wait_for_component(
+                self.bot, components=action_row, timeout=10
+            )
+        except asyncio.TimeoutError:
+            raise UserError("Timed out.")
+        await button_ctx.edit_origin(
+            content=f"Adding {name} to the tracker...", components=[]
+        )
+        scope = button_ctx.component_id
+        owner = ctx.guild_id if scope == "faction" else ctx.author_id
+        template = Template.from_base(
+            base_template, name, url, canvas.info["canvasCode"], owner, scope
         )
         await template_manager.add_template(template)
         file, embed = await template_preview(template, self.bot, canvas, EMBED_COLOR)
-        await ctx.send(file=file, embed=embed)
+        await msg.edit(content="", file=file, embed=embed)
 
     @cog_ext.cog_subcommand(
         base="template",

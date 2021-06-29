@@ -67,7 +67,10 @@ class Events(commands.Cog):
                 "An unexpected error occured. Please contact the bot developer."
             )
         embed = discord.Embed(title=title, description=description, color=0xCC0000)
-        await ctx.send(embed=embed)
+        if ctx.responded:
+            await ctx.message.edit(content="", components=[], embed=embed)
+        else:
+            await ctx.send(embed=embed)
         if unexpected:
             logger.error(
                 f"An error has occured while running: "

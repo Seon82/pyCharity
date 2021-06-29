@@ -121,11 +121,12 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
 [[package]]
 name = "discord-py-slash-command"
-version = "2.0.1"
+version = "2.0.4"
 description = "A simple interaction handler for discord.py."
 category = "main"
 optional = false
 python-versions = ">=3.6"
+develop = false
 
 [package.dependencies]
 aiohttp = "*"
@@ -135,6 +136,12 @@ aiohttp = "*"
 dev = ["black", "flake8", "isort", "sphinx", "sphinx-rtd-theme"]
 lint = ["black", "flake8", "isort", "sphinx", "sphinx-rtd-theme"]
 readthedocs = ["sphinx", "sphinx-rtd-theme"]
+
+[package.source]
+type = "git"
+url = "https://github.com/Seon82/discord-py-interactions"
+reference = "master"
+resolved_reference = "343fd4559e99574352b4a11991e8355f133a7e13"
 
 [[package]]
 name = "discord.py"
@@ -364,7 +371,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "3173684383066f2e85cdf0eb151a948078a9f6c40d3f12bcca64fb2961dbc1d4"
+content-hash = "870d04eeea43c9439d1c838b0c3d68aaca2c2cc9e3343e40ea6f7af948538eda"
 
 [metadata.files]
 aiohttp = [
@@ -442,10 +449,7 @@ colorama = [
     {file = "colorama-0.4.4-py2.py3-none-any.whl", hash = "sha256:9f47eda37229f68eee03b24b9748937c7dc3868f906e8ba69fbcbdd3bc5dc3e2"},
     {file = "colorama-0.4.4.tar.gz", hash = "sha256:5941b2b48a20143d2267e95b1c2a7603ce057ee39fd88e7329b0c292aa16869b"},
 ]
-discord-py-slash-command = [
-    {file = "discord-py-slash-command-2.0.1.tar.gz", hash = "sha256:8ca05b1e48cf937f6220db2592e552aca764e745084d23cbe30dab3ca252fadb"},
-    {file = "discord_py_slash_command-2.0.1-py3-none-any.whl", hash = "sha256:b59b7dd8a5c2b0414cbe1d1cbc40e65ce493ac28e2ba567d24f4cbecbc50dc10"},
-]
+discord-py-slash-command = []
 "discord.py" = [
     {file = "discord.py-1.7.3-py3-none-any.whl", hash = "sha256:c6f64db136de0e18e090f6752ea68bdd4ab0a61b82dfe7acecefa22d6477bb0c"},
     {file = "discord.py-1.7.3.tar.gz", hash = "sha256:462cd0fe307aef8b29cbfa8dd613e548ae4b2cb581d46da9ac0d46fb6ea19408"},

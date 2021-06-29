@@ -31,9 +31,7 @@ class HelpCommand(commands.Cog):
             ),
             "template add": (
                 "`/template add <name> <url> {faction=False}`: Add a template to the"
-                " global tracker under a chosen name! If you're a server manager, you"
-                " can specify `faction:True` to highlight the template in your server"
-                " and make it editable by any of your server's mods."
+                " global tracker under a chosen name."
             ),
             "template remove": (
                 "`/template remove <name>`: Remove one of your templates from the"

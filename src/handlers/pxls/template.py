@@ -177,3 +177,27 @@ class Template(BaseTemplate):
             canvas_code=canvas.info["canvasCode"],
             scope=scope,
         )
+
+    @classmethod
+    def from_base(
+        cls,
+        base_template: BaseTemplate,
+        name: str,
+        url: str,
+        canvas_code: str,
+        owner: int,
+        scope: str,
+    ):
+        """
+        Create a Template from a BaseTemplate.
+        """
+        return cls(
+            array=base_template.image,
+            ox=base_template.ox,
+            oy=base_template.oy,
+            name=name,
+            url=url,
+            owner=owner,
+            canvas_code=canvas_code,
+            scope=scope,
+        )

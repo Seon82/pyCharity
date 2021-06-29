@@ -1,5 +1,8 @@
 import io
+from typing import Optional
 import discord
+from discord_slash.utils import manage_components
+from discord_slash.model import ButtonStyle
 from PIL import Image
 
 
@@ -57,3 +60,19 @@ async def template_preview(template, bot, canvas, embed_color):
     template_img = await template.render(canvas.palette)
     file = attach_image(template_img, embed)
     return file, embed
+
+
+def button(
+    label: str,
+    custom_id: Optional[str] = None,
+    style: str = "gray",
+):
+    """
+    Create and return a button component.
+    :param label: The button's label.
+    :param custom_id: The button's unique identifier.
+    :param style: A ButtonStyle attribute.
+    """
+    return manage_components.create_button(
+        style=getattr(ButtonStyle, style), label=label, custom_id=custom_id
+    )
