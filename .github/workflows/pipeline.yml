@@ -1,4 +1,4 @@
-name: Black and pylint linting
+name: Code quality
 
 on: [push, pull_request]
 
