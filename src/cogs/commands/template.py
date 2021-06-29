@@ -160,8 +160,8 @@ class TemplateCommand(commands.Cog):
         total_description = ""
         for header in scopes:
             if len(descriptions[header]) > 0:
-                total_description += f"**{header.upper()}** templates:\n"
-                total_description += descriptions[scope] + "\n"
+                total_description += f"**{header.capitalize()} templates**:\n"
+                total_description += descriptions[header] + "\n"
         if total_description == "":
             total_description = "No templates are being tracked yet."
         embed.description = total_description
