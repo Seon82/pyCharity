@@ -1,4 +1,5 @@
 import logging
+from os.path import join, dirname
 import discord
 from discord.ext import commands
 from handlers.discord_utils import UserError
@@ -14,26 +15,12 @@ class Events(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.welcome_message = (
-            "Glad to meet you guys! I'm {}, "
-            + "a bot made to help you manage everything pxls. :smiley:\n\n"
-            + "At my core, I'm a template tracker:\n"
-            + "• If you're a **regular user**, you can share a template to a global dashboard by using "
-            + "`/template add <name:some name> <url:your template link>`. "
-            + "That's it, anyone using Charity can now see your template! "
-            + "They just have to run  `/template list` in my DMs or on any server I'm on.\n\n"
-            + "• If you're a **faction admin**, you can add a 'faction template' to the "
-            + "global dashboard by running `/template add <name:some name> <url:your template link> "
-            + "<faction:true>` on your faction's server.\nThis 'faction template' will be editable from "
-            + "your server by anyone with moderator permissions  to make it easier to roll out changes. "
-            + "On top of that, it will show up in a special spot when someone runs  `/template list` "
-            + "on your server to make it easier for members to quickly grab the latest project.\n\n"
-            + ":mag_right: I have quite a few other quality-of-life functions, you can take a better look at them "
-            + "whenever you want with `/help`."
-        )
+        with open(join(dirname(__file__), "../assets/welcome_message.txt")) as msg:
+            self.welcome_message = msg.read()
 
     @commands.Cog.listener()
     async def on_ready(self):
+        """Set activity and log message when the bot has started up."""
         await self.bot.change_presence(
             activity=discord.Activity(
                 name="pxls.space", type=discord.ActivityType.watching
@@ -62,14 +49,17 @@ class Events(commands.Cog):
             await filtered_channels[0].send(embed=embed)
 
     @commands.Cog.listener()
-    async def on_slash_command_error(_, ctx, error):
+    async def on_slash_command_error(self, ctx, error):
         """Error message handler."""
         unexpected = False
         title = "❌ Error"
         if isinstance(error, UserError):
             description = error.args[0]
         elif isinstance(error, commands.errors.CommandOnCooldown):
-            description = f"This command is on cooldown. Please try again in `{error.retry_after:.2f}s`."
+            description = (
+                "This command is on cooldown.",
+                f"Please try again in `{error.retry_after:.2f}s`.",
+            )
         else:
             unexpected = True
             description = (

@@ -17,7 +17,7 @@ class ProgressCommand(commands.Cog):
         guild_ids=GUILD_IDS,
         options=[
             create_option(
-                name=f"template",
+                name="template",
                 description="Template name or link.",
                 option_type=3,
                 required=True,
@@ -42,7 +42,10 @@ class ProgressCommand(commands.Cog):
         image = await PalettizedImage(progress_array).render(
             [(255, 0, 0, 255), (0, 255, 0, 255)]
         )
-        description = f"{100*completed_pixels/total_pixels:.1f}% complete ({completed_pixels}/{total_pixels} pixels)."
+        description = (
+            f"{100*completed_pixels/total_pixels:.1f}% complete"
+            f" ({completed_pixels}/{total_pixels} pixels)."
+        )
         embed = discord.Embed(
             title="Progress", description=description, color=EMBED_COLOR
         )

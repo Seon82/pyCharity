@@ -177,7 +177,8 @@ class TemplateCommand(commands.Cog):
         file, embed = await template_preview(template, self.bot, canvas, EMBED_COLOR)
         await ctx.send(file=file, embed=embed)
 
-    def _check_permissions(self, ctx: SlashContext, template_info: dict):
+    @staticmethod
+    def _check_permissions(ctx: SlashContext, template_info: dict):
         """
         Check whether a user has permissions over a template.
         Raises a UserError if they don't, returns None otherwise.
@@ -190,9 +191,9 @@ class TemplateCommand(commands.Cog):
             raise UserError("Invalid template name.")
         scope, owner = template_info["scope"], template_info["owner"]
         if scope == "faction" and ctx.guild is None:
-            raise UserError(f"A faction template can't be managed from DMs.")
+            raise UserError("A faction template can't be managed from DMs.")
         if scope == "faction" and ctx.guild.id != owner:
-            raise UserError(f"This template doesn't belong to this server.")
+            raise UserError("This template doesn't belong to this server.")
         if scope == "faction" and not ctx.author.guild_permissions.manage_guild:
             raise UserError(
                 "You do not have the permission to manage faction templates."

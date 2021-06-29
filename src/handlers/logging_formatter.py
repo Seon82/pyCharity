@@ -36,8 +36,8 @@ def root_logger(name, level="INFO"):
     """
     logger = logging.getLogger(name)
     logger.setLevel(getattr(logging, level))
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.DEBUG)
-    ch.setFormatter(CustomFormatter())
-    logger.addHandler(ch)
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.DEBUG)
+    console_handler.setFormatter(CustomFormatter())
+    logger.addHandler(console_handler)
     return logger

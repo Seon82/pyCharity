@@ -13,9 +13,11 @@ class Clock(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        # pylint: disable = no-member
         self.update_board.start()
 
     def cog_unload(self):
+        # pylint: disable = no-member
         self.update_board.cancel()
 
     @tasks.loop(minutes=5)
@@ -28,11 +30,12 @@ class Clock(commands.Cog):
             canvas.board = board
             logger.debug("Board updated.")
             ws_client.resume()
-        except Exception as e:
-            logger.warning("Error while fetching board.", e)
+        except Exception as error:
+            logger.warning(f"Error while fetching board: {error}")
 
     @update_board.before_loop
     async def before(self):
+        """Run before main loop is started."""
         logger.debug("Clock is waiting...")
         await self.bot.wait_until_ready()
 

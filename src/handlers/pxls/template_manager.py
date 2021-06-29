@@ -93,6 +93,7 @@ class TemplateManager:
             return True
         return False
 
+    # pylint: disable = dangerous-default-value
     async def find(self, projection={}, **query):
         """
         Get a generator returning data from an arbitrary find query.
@@ -100,6 +101,7 @@ class TemplateManager:
         async for document in self.collection.find(query, projection):
             yield document
 
+    # pylint: disable = dangerous-default-value
     async def find_one(self, projection={}, **query):
         """
         Get the data from an arbitrary find query.

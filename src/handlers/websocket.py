@@ -21,15 +21,18 @@ class WebsocketClient:
         self._paused = False
 
     def start(self):
+        """Start the websocket in a separate thread."""
         self.thread.start()
 
     def _start(self):
         self.loop.run_until_complete(self._listen())
 
     def pause(self):
+        """Pause all websocket processing."""
         self._paused = True
 
     def resume(self):
+        """Resume all websocket processing."""
         self._paused = False
 
     async def _listen(self):
@@ -45,8 +48,8 @@ class WebsocketClient:
                             if data["type"] == "pixel":
                                 for update in data["pixels"]:
                                     self.canvas.update_pixel(**update)
-                        except Exception as e:
-                            logger.warning("Websocket client raised", e)
-            except Exception as e:
-                logger.warning(f"Websocket disconnected: {e}")
+                        except Exception as error:
+                            logger.warning(f"Websocket client raised {error}")
+            except Exception as error:
+                logger.warning(f"Websocket disconnected: {error}")
                 logger.info("Attempting reconnect...")

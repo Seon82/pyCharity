@@ -4,7 +4,11 @@ from PIL import Image
 
 
 class UserError(Exception):
-    pass
+    """
+    Exception used to notify the user of an error.
+    Will be caught by the error handler and broadcasted
+    back at them as a message.
+    """
 
 
 def attach_image(

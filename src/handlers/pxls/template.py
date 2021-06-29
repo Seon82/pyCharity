@@ -3,7 +3,7 @@ from urllib.parse import parse_qs
 from PIL import Image
 import numpy as np
 from aioify import aioify
-from handlers.pxls.canvas import Canvas
+from .canvas import Canvas
 from .image import PalettizedImage
 from .utils import download_image
 
@@ -111,8 +111,8 @@ class BaseTemplate(PalettizedImage):
         # uses a crazy amount of memory and is a tad slower on real images.
         best_match_idx = np.zeros(rendered_array.shape[:2], dtype=np.uint8)
         best_match_dist = np.full(rendered_array.shape[:2], 500)  # 500<sqrt(3*255^2)
-        for idx, c in enumerate(palette):
-            color_distance = np.linalg.norm(rendered_array - c, axis=-1)
+        for idx, color in enumerate(palette):
+            color_distance = np.linalg.norm(rendered_array - color, axis=-1)
             closer_mask = color_distance < best_match_dist
             best_match_dist[closer_mask] = color_distance[closer_mask]
             best_match_idx[closer_mask] = idx
@@ -154,6 +154,7 @@ class Template(BaseTemplate):
         self.scope = scope
         self.canvas_code = canvas_code
 
+    # pylint: disable = arguments-differ
     @classmethod
     async def from_url(
         cls, url: str, canvas: Canvas, name: str, owner: int, scope: str

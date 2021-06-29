@@ -2,8 +2,8 @@ import os
 import asyncio
 import logging
 from dotenv import load_dotenv
-from handlers.pxls import Canvas, TemplateManager
-from handlers.websocket import WebsocketClient
+from .pxls import Canvas, TemplateManager
+from .websocket import WebsocketClient
 
 logger = logging.getLogger("pyCharity." + __name__)
 logger.info("Setting up...")
