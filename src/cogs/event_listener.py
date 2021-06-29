@@ -18,18 +18,15 @@ class Events(commands.Cog):
         assets = join(dirname(__file__), "../assets")
         with open(join(assets, "welcome_message.txt")) as msg:
             self.welcome_message = msg.read()
-        with open(join(assets, "profile.png"), "rb") as avatar:
-            self.avatar = avatar.read()
 
     @commands.Cog.listener()
     async def on_ready(self):
-        """Set activity and avatar once the bot has started up."""
+        """Set presence once the bot has started up."""
         await self.bot.change_presence(
             activity=discord.Activity(
                 name="pxls.space", type=discord.ActivityType.watching
             )
         )
-        await self.bot.user.edit(avatar=self.avatar)
         logger.info("Ready!")
 
     @commands.Cog.listener()
