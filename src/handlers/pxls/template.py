@@ -166,7 +166,7 @@ class Template(BaseTemplate):
         :param canvas: The template's canvas.
         :param name: The template's name.
         :param owner: The owner id.
-        :param scope: 'faction'|'user'
+        :param scope: 'global'|'faction'|'private'
         """
         return await super().from_url(
             template_url=url,

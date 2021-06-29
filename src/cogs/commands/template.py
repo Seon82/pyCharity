@@ -45,9 +45,12 @@ class TemplateCommand(commands.Cog):
         ):
             raise UserError("A template with this name already exists.")
         base_template = await BaseTemplate.from_url(url, canvas=canvas)
-        buttons = [button("Global template", "user")]
+        buttons = [
+            button("Global template", "global"),
+            button("Private template", "private"),
+        ]
         if ctx.guild and ctx.author.guild_permissions.manage_guild:
-            buttons.append(button("Faction template", "faction"))
+            buttons.insert(0, button("Faction template", "faction"))
         action_row = manage_components.create_actionrow(*buttons)
         msg = await ctx.send(
             f"Ready to add {name} to the tracker! What kind of template is it?",
@@ -55,7 +58,7 @@ class TemplateCommand(commands.Cog):
         )
         try:
             button_ctx = await manage_components.wait_for_component(
-                self.bot, components=action_row, timeout=10
+                self.bot, components=action_row, timeout=20
             )
         except asyncio.TimeoutError:
             raise UserError("Timed out.")
@@ -136,33 +139,31 @@ class TemplateCommand(commands.Cog):
     async def _list(self, ctx: SlashContext):
         await ctx.defer()
         embed = discord.Embed(color=EMBED_COLOR)
-        faction_description = ""
-        global_description = ""
+        scopes = ["private", "global", "faction"]
+        descriptions = {scope: "" for scope in scopes}
         # Only fetch the metadata and not the image
         template_info = template_manager.find(
             projection={"image": False}, canvas_code=canvas.info["canvasCode"]
         )
         async for info in template_info:
-            owner_name = await get_owner_name(info["scope"], info["owner"], self.bot)
+            scope, owner = info["scope"], info["owner"]
+            owner_name = await get_owner_name(scope, owner, self.bot)
             description = f"• **[{info['name']}]({info['url']})**, by {owner_name}\n"
-            if (
-                ctx.guild  # None if we're in DMs
-                and info["scope"] == "faction"
-                and info["owner"] == ctx.guild.id
-            ):
-                faction_description += description
-            else:
-                global_description += description
+            if scope == "private" and ctx.guild is None:  # In DMs
+                descriptions["private"] += description
+            elif scope == "faction" and ctx.guild_id == owner:
+                descriptions["faction"] += description
+            elif scope != "private":
+                descriptions["global"] += description
 
-        # Combine bothe faction and global description
+        # Combine all descriptions
         total_description = ""
-        if len(faction_description) > 0:
-            total_description += f"**Faction templates:**\n {faction_description}\n\n"
-        total_description += "**Global templates:**\n"
-        if len(global_description) > 0:
-            total_description += global_description
-        else:
-            total_description += "No templates are being tracked yet."
+        for header in scopes:
+            if len(descriptions[header]) > 0:
+                total_description += f"**{header.upper()}** templates:\n"
+                total_description += descriptions[scope] + "\n"
+        if total_description == "":
+            total_description = "No templates are being tracked yet."
         embed.description = total_description
         await ctx.send(embed=embed)
 
@@ -181,6 +182,8 @@ class TemplateCommand(commands.Cog):
         )
         if template is None:
             raise UserError("Invalid template name.")
+        if template.scope == "private" and ctx.author_id != template.owner:
+            raise UserError("This template is private.")
         file, embed = await template_preview(template, self.bot, canvas, EMBED_COLOR)
         await ctx.send(file=file, embed=embed)
 
@@ -205,7 +208,7 @@ class TemplateCommand(commands.Cog):
             raise UserError(
                 "You do not have the permission to manage faction templates."
             )
-        if scope == "user" and ctx.author.id != owner:
+        if scope in ["private", "global"] and ctx.author.id != owner:
             raise UserError("This template doesn't belong to you.")
 
 

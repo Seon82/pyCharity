@@ -37,12 +37,13 @@ async def get_owner_name(scope, owner_id, bot):
     """
     Get the owner's name.
     """
-    if scope == "user":
-        owner = await bot.fetch_user(owner_id)
-        owner_name = f"{owner.name}#{owner.discriminator}"
-    else:
+    if scope == "faction":
         owner = await bot.fetch_guild(owner_id)
         owner_name = owner.name
+    else:
+        owner = await bot.fetch_user(owner_id)
+        owner_name = f"{owner.name}#{owner.discriminator}"
+
     return owner_name
 
 
