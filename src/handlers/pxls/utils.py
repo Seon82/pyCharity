@@ -1,5 +1,6 @@
 import math
 from io import BytesIO
+from typing import Optional
 from PIL import Image
 import aiohttp
 from aioify import aioify
@@ -87,14 +88,17 @@ class Progress:
     Template progress data container.
     """
 
-    def __init__(self, correct: int, total: int):
+    def __init__(self, correct: int, total: int, array: Optional[np.ndarray] = None):
         """
         :param correct: The number of correct pixels.
         :param total: The number of non-transparent, placeable pixels
         in the template.
+        :param array: A numpy array showing visual progress
+        (0=wrong, 1=correct, 2=not in placemap, 255=transparent).
         """
         self.correct = correct
         self.total = total
+        self.array = array
 
     @property
     def percentage(self):
@@ -111,13 +115,11 @@ class Progress:
 
 
 @aioify
-def measure_progress(canvas, template):
+def compute_progress(canvas, template, compute_array=False) -> Progress:
     """
     Measure the completion of a template.
 
-    :return: (progress_array, progress).
-    progress_array is a np.ndarray containing 1 where the template pixels are correct on
-    the canvas and 0 elsewhere.
+    :param compute_array: Wheter to attach progress_array to the returned Progress.
     """
     ox, oy = template.ox, template.oy
     canvas_section = canvas.board.image[
@@ -131,4 +133,10 @@ def measure_progress(canvas, template):
     transparent_num = np.count_nonzero(mask)
     completed_pixels = np.count_nonzero(progress_array) - transparent_num
     total_pixels = canvas_section.size - transparent_num
-    return progress_array, Progress(completed_pixels, total_pixels)
+    if compute_array:
+        progress_array[
+            np.logical_and(np.logical_not(template_transparent), canvas_transparent)
+        ] = 2
+        return Progress(completed_pixels, total_pixels, progress_array)
+
+    return Progress(completed_pixels, total_pixels)

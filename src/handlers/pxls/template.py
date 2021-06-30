@@ -5,7 +5,7 @@ import numpy as np
 from aioify import aioify
 from .canvas import Canvas
 from .image import PalettizedImage
-from .utils import download_image, measure_progress, Progress
+from .utils import download_image, compute_progress, Progress
 
 
 class BaseTemplate(PalettizedImage):
@@ -194,7 +194,7 @@ class Template(BaseTemplate):
         """
         Create a Template from a BaseTemplate.
         """
-        _, progress = await measure_progress(canvas, base_template)
+        progress = await compute_progress(canvas, base_template)
         return cls(
             array=base_template.image,
             ox=base_template.ox,

@@ -126,7 +126,7 @@ class TemplateCommand(commands.Cog):
             raise UserError("Deletion failed. Please contact the bot developer.")
         embed = discord.Embed(
             title="Deleted!",
-            description=f"Successfully deleted {name} from the tracker.",
+            description=f"Successfully deleted `{name}` from the tracker.",
             color=EMBED_COLOR,
         )
         await ctx.send(embed=embed)

@@ -36,11 +36,11 @@ class ProgressCommand(commands.Cog):
             )
             if template is None:
                 raise UserError(f"{template_name} isn't a valid template name.")
-        progress_array, progress = await utils.measure_progress(
-            canvas=canvas, template=template
+        progress = await utils.compute_progress(
+            canvas=canvas, template=template, compute_array=True
         )
-        image = await PalettizedImage(progress_array).render(
-            [(255, 0, 0, 255), (0, 255, 0, 255)]
+        image = await PalettizedImage(progress.array).render(
+            [(255, 0, 0, 255), (0, 255, 0, 255), (70, 70, 70, 100)]
         )
         description = (
             f"{progress.percentage:.1f}% complete"

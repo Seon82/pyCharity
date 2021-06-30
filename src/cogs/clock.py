@@ -1,6 +1,6 @@
 import logging
 from discord.ext import tasks, commands
-from handlers.pxls.utils import measure_progress
+from handlers.pxls.utils import compute_progress
 from handlers.setup import canvas, ws_client, template_manager
 
 logger = logging.getLogger("pyCharity." + __name__)
@@ -21,7 +21,7 @@ class Clock(commands.Cog):
         # pylint: disable = no-member
         self.update_board.cancel()
 
-    @tasks.loop(minutes=0.5)
+    @tasks.loop(minutes=5)
     async def update_board(self):
         """Update the canvas info and template progress periodically."""
         try:
@@ -38,7 +38,7 @@ class Clock(commands.Cog):
                 canvas_code=canvas.info["canvasCode"]
             )
             async for template in templates:
-                _, new_progress = await measure_progress(canvas, template)
+                new_progress = await compute_progress(canvas, template)
                 await template_manager.update_template(
                     template, data={"progress": new_progress.to_dict()}
                 )
