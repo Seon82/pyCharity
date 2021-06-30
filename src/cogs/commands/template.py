@@ -1,10 +1,11 @@
+from typing import Optional
 import discord
 from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
 from discord_slash.utils.manage_commands import create_option
 from handlers.setup import GUILD_IDS, canvas, template_manager, EMBED_COLOR
 from handlers.discord_utils import (
-    get_owner_name,
+    render_list,
     UserError,
     template_preview,
     button,
@@ -24,6 +25,13 @@ name_option = create_option(
     description="Template name.",
     option_type=3,
     required=True,
+)
+
+sort_option = create_option(
+    name="sort",
+    description="Sort by progress order: 'up' or 'down'",
+    option_type=3,
+    required=False,
 )
 
 
@@ -54,7 +62,7 @@ class TemplateCommand(commands.Cog):
             button("Make it public", "global"),
             button("Keep it private", "private"),
         ]
-        button_ctx = await ask_alternatives(ctx, self.bot, question, buttons)
+        button_ctx = await ask_alternatives(ctx, self.bot, buttons, content=question)
         if (
             button_ctx.component_id == "global"
             and ctx.guild
@@ -65,7 +73,9 @@ class TemplateCommand(commands.Cog):
                 button("Personal project", "global"),
                 button("Faction project", "faction"),
             ]
-            button_ctx = await ask_alternatives(button_ctx, self.bot, question, buttons)
+            button_ctx = await ask_alternatives(
+                button_ctx, self.bot, buttons, content=question
+            )
         await button_ctx.edit_origin(content="Almost done...", components=[])
         scope = button_ctx.component_id
         owner = ctx.guild_id if scope == "faction" else ctx.author_id
@@ -136,38 +146,37 @@ class TemplateCommand(commands.Cog):
         name="list",
         guild_ids=GUILD_IDS,
         description="Display all currently tracked templates.",
+        options=[sort_option],
     )
     @commands.cooldown(1, 3, commands.BucketType.user)
-    async def _list(self, ctx: SlashContext):
+    async def _list(self, ctx: SlashContext, sort: Optional[str] = None):
         await ctx.defer()
-        embed = discord.Embed(color=EMBED_COLOR)
+        if sort == "":
+            sort = None
+        if not sort is None:
+            sort = sort.lower()
+            if not sort in ["up", "down"]:
+                raise UserError("The sort order must be `up` or `down`.")
         scopes = ["private", "global", "faction"]
-        descriptions = {scope: "" for scope in scopes}
+        templates = {scope: [] for scope in scopes}
         # Only fetch the metadata and not the image
         template_info = template_manager.find(
             projection={"image": False}, canvas_code=canvas.info["canvasCode"]
         )
         async for info in template_info:
-            scope, owner = info["scope"], info["owner"]
-            owner_name = await get_owner_name(scope, owner, self.bot)
-            progress = round(utils.Progress(**info["progress"]).percentage, 1)
-            description = f"• **[{info['name']}]({info['url']})** ({progress}%), by {owner_name}\n"
-            if scope == "private" and ctx.guild is None:  # In DMs
-                descriptions["private"] += description
-            elif scope == "faction" and ctx.guild_id == owner:
-                descriptions["faction"] += description
-            elif scope != "private":
-                descriptions["global"] += description
-
-        # Combine all descriptions
-        total_description = ""
-        for header in scopes:
-            if len(descriptions[header]) > 0:
-                total_description += f"**{header.capitalize()} templates**:\n"
-                total_description += descriptions[header] + "\n"
-        if total_description == "":
-            total_description = "No templates are being tracked yet."
-        embed.description = total_description
+            if info["scope"] == "private" and ctx.guild is None:  # In DMs
+                templates["private"].append(info)
+            elif info["scope"] == "faction" and ctx.guild_id == info["owner"]:
+                templates["faction"].append(info)
+            elif info["scope"] != "private":
+                templates["global"].append(info)
+        if sort:
+            sorter = lambda info: utils.Progress(**info["progress"]).percentage
+            templates = {
+                scope: sorted(temps, key=sorter, reverse=sort == "down")
+                for scope, temps in templates.items()
+            }
+        embed = await render_list(self.bot, templates, EMBED_COLOR)
         await ctx.send(embed=embed)
 
     @cog_ext.cog_subcommand(

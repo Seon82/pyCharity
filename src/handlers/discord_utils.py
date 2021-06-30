@@ -1,11 +1,12 @@
 import io
 import asyncio
-from typing import Optional
+from typing import Optional, Dict, List
 import discord
 from discord_slash.context import ComponentContext
 from discord_slash.utils import manage_components
 from discord_slash.model import ButtonStyle
 from PIL import Image
+from .pxls.utils import Progress
 
 
 class UserError(Exception):
@@ -81,7 +82,7 @@ def button(
     )
 
 
-async def ask_alternatives(ctx, bot, question: str, buttons: list, timeout: int = 20):
+async def ask_alternatives(ctx, bot, buttons: list, timeout: int = 20, **kwargs):
     """
     Ask a  question.
     """
@@ -91,7 +92,7 @@ async def ask_alternatives(ctx, bot, question: str, buttons: list, timeout: int 
     else:
         sender = ctx.send
     await sender(
-        content=question,
+        **kwargs,
         components=[action_row],
     )
     try:
@@ -101,3 +102,27 @@ async def ask_alternatives(ctx, bot, question: str, buttons: list, timeout: int 
     except asyncio.TimeoutError:
         raise UserError("Timed out.")
     return button_ctx
+
+
+async def render_list(bot, templates: List[Dict[str, list]], embed_color: int):
+    """
+    Generate an embed representing a template list.
+
+    :param templates: A dictionary mapping category names
+    to lists of template info (dicts).
+    """
+    total_description = ""
+    for scope in templates.keys():
+        if len(templates[scope]) > 0:
+            total_description += f"**{scope.capitalize()} templates**:\n"
+            for template in templates[scope]:
+                owner_name = await get_owner_name(scope, template["owner"], bot)
+                progress = round(Progress(**template["progress"]).percentage, 1)
+                total_description += (
+                    f"• **[{template['name']}]({template['url']})**"
+                    f" ({progress}%), by {owner_name}\n"
+                )
+    if total_description == "":
+        total_description = "No templates are being tracked yet."
+    embed = discord.Embed(color=embed_color, description=total_description)
+    return embed

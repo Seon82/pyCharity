@@ -31,16 +31,15 @@ class HelpCommand(commands.Cog):
             ),
             "template add": (
                 "`/template add <name> <url> {faction=False}`: Add a template to the"
-                " global tracker under a chosen name."
+                " tracker under a chosen name."
             ),
             "template remove": (
                 "`/template remove <name>`: Remove one of your templates from the"
                 " tracker."
             ),
             "template list": (
-                "`/template list`: Show all templates in the global tracker! When run"
-                " on a server, also highlights the server's templates to make it easy"
-                " to see what they're working on."
+                "`/template list {sort}`: Show all templates in the global tracker! "
+                " Set sort to `up` or `down` to order by ascending or descending progress."
             ),
             "template show": (
                 "`/template view <name>`: Display a preview of a template from the"
@@ -63,10 +62,7 @@ class HelpCommand(commands.Cog):
             color=EMBED_COLOR,
         )
         embed.set_footer(
-            text=(
-                "<param> is a mandatory parameter. {param=default_value} is an optional"
-                " parameter."
-            )
+            text="<param> is a mandatory parameter. {param} is an optional parameter."
         )
         await ctx.send(embed=embed)
 

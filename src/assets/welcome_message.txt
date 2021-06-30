@@ -1,9 +1,5 @@
 Glad to meet you guys! I'm {}, a bot made to help you manage everything pxls. :smiley:
 
-At my core, I'm a template tracker:
-• If you're a **regular user**, you can share a template to a global dashboard by using `/template add <name:some name> <url:your template link>`. That's it, anyone using Charity can now see your template! They just have to run  `/template list` in my DMs or on any server I'm on.
-
-• If you're a **faction admin**, you can add a 'faction template' to the global dashboard by running `/template add <name:some name> <url:your template link> <faction:true>` on your faction's server.
-This 'faction template' will be editable from your server by anyone with moderator permissions  to make it easier to roll out changes. On top of that, it will show up in a special spot when someone runs  `/template list` on your server to make it easier for members to quickly grab the latest project.
+At my core, I'm a template tracker. Try me out, and add a template to the tracker with `/template add`!
 
 :mag_right: I have quite a few other quality-of-life functions, you can take a better look at them whenever you want with `/help`.
