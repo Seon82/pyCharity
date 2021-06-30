@@ -1,11 +1,15 @@
-import asyncio
 import discord
 from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
 from discord_slash.utils.manage_commands import create_option
-from discord_slash.utils import manage_components
 from handlers.setup import GUILD_IDS, canvas, template_manager, EMBED_COLOR
-from handlers.discord_utils import get_owner_name, UserError, template_preview, button
+from handlers.discord_utils import (
+    get_owner_name,
+    UserError,
+    template_preview,
+    button,
+    ask_alternatives,
+)
 from handlers.pxls import Template, BaseTemplate, utils
 
 url_option = create_option(
@@ -45,26 +49,24 @@ class TemplateCommand(commands.Cog):
         ):
             raise UserError("A template with this name already exists.")
         base_template = await BaseTemplate.from_url(url, canvas=canvas)
+        question = f"Should I add `{name}` to the public tracker?"
         buttons = [
-            button("Global template", "global"),
-            button("Private template", "private"),
+            button("Make it public", "global"),
+            button("Keep it private", "private"),
         ]
-        if ctx.guild and ctx.author.guild_permissions.manage_guild:
-            buttons.insert(0, button("Faction template", "faction"))
-        action_row = manage_components.create_actionrow(*buttons)
-        msg = await ctx.send(
-            f"Ready to add {name} to the tracker! What kind of template is it?",
-            components=[action_row],
-        )
-        try:
-            button_ctx = await manage_components.wait_for_component(
-                self.bot, components=action_row, timeout=20
-            )
-        except asyncio.TimeoutError:
-            raise UserError("Timed out.")
-        await button_ctx.edit_origin(
-            content=f"Adding {name} to the tracker...", components=[]
-        )
+        button_ctx = await ask_alternatives(ctx, self.bot, question, buttons)
+        if (
+            button_ctx.component_id == "global"
+            and ctx.guild
+            and ctx.author.guild_permissions.manage_guild
+        ):
+            question = "Is this a personal project?"
+            buttons = [
+                button("Personal project", "global"),
+                button("Faction project", "faction"),
+            ]
+            button_ctx = await ask_alternatives(button_ctx, self.bot, question, buttons)
+        await button_ctx.edit_origin(content="Almost done...", components=[])
         scope = button_ctx.component_id
         owner = ctx.guild_id if scope == "faction" else ctx.author_id
         template = Template.from_base(
@@ -72,7 +74,7 @@ class TemplateCommand(commands.Cog):
         )
         await template_manager.add_template(template)
         file, embed = await template_preview(template, self.bot, canvas, EMBED_COLOR)
-        await msg.edit(content="", file=file, embed=embed)
+        await ctx.message.edit(content="", file=file, embed=embed)
 
     @cog_ext.cog_subcommand(
         base="template",

@@ -1,6 +1,8 @@
 import io
+import asyncio
 from typing import Optional
 import discord
+from discord_slash.context import ComponentContext
 from discord_slash.utils import manage_components
 from discord_slash.model import ButtonStyle
 from PIL import Image
@@ -66,7 +68,7 @@ async def template_preview(template, bot, canvas, embed_color):
 def button(
     label: str,
     custom_id: Optional[str] = None,
-    style: str = "gray",
+    style: str = "blurple",
 ):
     """
     Create and return a button component.
@@ -77,3 +79,25 @@ def button(
     return manage_components.create_button(
         style=getattr(ButtonStyle, style), label=label, custom_id=custom_id
     )
+
+
+async def ask_alternatives(ctx, bot, question: str, buttons: list, timeout: int = 20):
+    """
+    Ask a  question.
+    """
+    action_row = manage_components.create_actionrow(*buttons)
+    if isinstance(ctx, ComponentContext):
+        sender = ctx.edit_origin
+    else:
+        sender = ctx.send
+    await sender(
+        content=question,
+        components=[action_row],
+    )
+    try:
+        button_ctx = await manage_components.wait_for_component(
+            bot, components=action_row, timeout=timeout
+        )
+    except asyncio.TimeoutError:
+        raise UserError("Timed out.")
+    return button_ctx
