@@ -82,16 +82,42 @@ def layer(canvas_width: int, canvas_height: int, *templates) -> PalettizedImage:
     return PalettizedImage(background[min_y:max_y, min_x:max_x])
 
 
+class Progress:
+    """
+    Template progress data container.
+    """
+
+    def __init__(self, correct: int, total: int):
+        """
+        :param correct: The number of correct pixels.
+        :param total: The number of non-transparent, placeable pixels
+        in the template.
+        """
+        self.correct = correct
+        self.total = total
+
+    @property
+    def percentage(self):
+        """
+        Get progress as a percentage.
+        """
+        return 100 * self.correct / self.total
+
+    def to_dict(self):
+        """
+        Serialize the object.
+        """
+        return {"correct": self.correct, "total": self.total}
+
+
 @aioify
-def progress(canvas, template):
+def measure_progress(canvas, template):
     """
     Measure the completion of a template.
 
-    :return: (progress_array, (completed_pixels, total_pixels).
+    :return: (progress_array, progress).
     progress_array is a np.ndarray containing 1 where the template pixels are correct on
     the canvas and 0 elsewhere.
-    completed_pixels in the amound of completed non-transparent pixels, and total_pixels
-    the total number of non-transparent pixels the template contains.
     """
     ox, oy = template.ox, template.oy
     canvas_section = canvas.board.image[
@@ -105,4 +131,4 @@ def progress(canvas, template):
     transparent_num = np.count_nonzero(mask)
     completed_pixels = np.count_nonzero(progress_array) - transparent_num
     total_pixels = canvas_section.size - transparent_num
-    return progress_array, (completed_pixels, total_pixels)
+    return progress_array, Progress(completed_pixels, total_pixels)

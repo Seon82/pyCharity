@@ -69,8 +69,8 @@ class TemplateCommand(commands.Cog):
         await button_ctx.edit_origin(content="Almost done...", components=[])
         scope = button_ctx.component_id
         owner = ctx.guild_id if scope == "faction" else ctx.author_id
-        template = Template.from_base(
-            base_template, name, url, canvas.info["canvasCode"], owner, scope
+        template = await Template.from_base(
+            base_template, name, url, canvas, owner, scope
         )
         await template_manager.add_template(template)
         file, embed = await template_preview(template, self.bot, canvas, EMBED_COLOR)
@@ -150,7 +150,8 @@ class TemplateCommand(commands.Cog):
         async for info in template_info:
             scope, owner = info["scope"], info["owner"]
             owner_name = await get_owner_name(scope, owner, self.bot)
-            description = f"• **[{info['name']}]({info['url']})**, by {owner_name}\n"
+            progress = round(utils.Progress(**info["progress"]).percentage, 1)
+            description = f"• **[{info['name']}]({info['url']})** ({progress}%), by {owner_name}\n"
             if scope == "private" and ctx.guild is None:  # In DMs
                 descriptions["private"] += description
             elif scope == "faction" and ctx.guild_id == owner:

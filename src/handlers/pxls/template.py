@@ -5,7 +5,7 @@ import numpy as np
 from aioify import aioify
 from .canvas import Canvas
 from .image import PalettizedImage
-from .utils import download_image
+from .utils import download_image, measure_progress, Progress
 
 
 class BaseTemplate(PalettizedImage):
@@ -20,7 +20,7 @@ class BaseTemplate(PalettizedImage):
         self.oy = oy
 
     @classmethod
-    async def from_url(cls, template_url: str, canvas: Canvas, *args, **kwargs):
+    async def from_url(cls, template_url: str, canvas: Canvas):
         """
         Generate a template from a pxls.space url.
         """
@@ -29,7 +29,7 @@ class BaseTemplate(PalettizedImage):
         palettized_array = await cls.reduce(rendered_image, canvas.palette)
         ox, oy = int(params["ox"][0]), int(params["oy"][0])
         palettized_array, ox, oy = cls.crop_to_canvas(palettized_array, ox, oy, canvas)
-        return cls(array=palettized_array, ox=ox, oy=oy, *args, **kwargs)
+        return cls(array=palettized_array, ox=ox, oy=oy)
 
     @staticmethod
     def crop_to_canvas(
@@ -136,6 +136,7 @@ class Template(BaseTemplate):
         canvas_code: str,
         owner: int,
         scope: str,
+        progress: Progress,
     ):
         """
         :param array: A palettized array representing the template image.
@@ -145,7 +146,8 @@ class Template(BaseTemplate):
         :param url: A pxls.space link to the original template.
         :param canavs_code: The canvas this template belong to.
         :param owner: The id of the faction or user owning this template.
-        :param scope: The type of the owner: 'faction'|'user'
+        :param scope: The type of the owner: 'faction'|'user',
+        :param progress: The template's progress state.
         """
         super().__init__(array, ox, oy)
         self.name = name
@@ -153,6 +155,7 @@ class Template(BaseTemplate):
         self.owner = owner
         self.scope = scope
         self.canvas_code = canvas_code
+        self.progress = progress
 
     # pylint: disable = arguments-differ
     @classmethod
@@ -168,29 +171,30 @@ class Template(BaseTemplate):
         :param owner: The owner id.
         :param scope: 'global'|'faction'|'private'
         """
-        return await super().from_url(
-            template_url=url,
-            canvas=canvas,
+        base_template = await BaseTemplate.from_url(url, canvas)
+        return await cls.from_base(
+            base_template=base_template,
             name=name,
             url=url,
+            canvas=canvas,
             owner=owner,
-            canvas_code=canvas.info["canvasCode"],
             scope=scope,
         )
 
     @classmethod
-    def from_base(
+    async def from_base(
         cls,
         base_template: BaseTemplate,
         name: str,
         url: str,
-        canvas_code: str,
+        canvas: Canvas,
         owner: int,
         scope: str,
     ):
         """
         Create a Template from a BaseTemplate.
         """
+        _, progress = await measure_progress(canvas, base_template)
         return cls(
             array=base_template.image,
             ox=base_template.ox,
@@ -198,6 +202,7 @@ class Template(BaseTemplate):
             name=name,
             url=url,
             owner=owner,
-            canvas_code=canvas_code,
+            canvas_code=canvas.info["canvasCode"],
             scope=scope,
+            progress=progress,
         )

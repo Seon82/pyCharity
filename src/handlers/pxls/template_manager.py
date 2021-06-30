@@ -2,6 +2,7 @@ import pickle
 from bson.binary import Binary
 import numpy as np
 from motor.motor_asyncio import AsyncIOMotorClient
+from .utils import Progress
 from .template import Template
 
 
@@ -42,6 +43,7 @@ class TemplateManager:
             url=document["url"],
             owner=document["owner"],
             scope=document["scope"],
+            progress=Progress(**document["progress"]),
         )
 
     def _template2doc(self, template: Template):
@@ -57,6 +59,7 @@ class TemplateManager:
             "oy": template.oy,
             "url": template.url,
             "image": self._serialize(template.image),
+            "progress": template.progress.to_dict(),
         }
         return data
 
@@ -67,12 +70,17 @@ class TemplateManager:
         data = self._template2doc(template)
         await self.collection.insert_one(data)
 
-    async def update_template(self, template: Template):
+    async def update_template(self, template: Template, data=None):
         """
         Update a template from the database.
+
+        :param data: A dictionary of fields to update. If set to None, updates all fields.
         """
-        data = self._template2doc(template)
-        await self.collection.update_one({"name": template.name}, {"$set": data})
+        if data is None:
+            data = self._template2doc(template)
+        await self.collection.update_one(
+            {"name": template.name, "canvas_code": template.canvas_code}, {"$set": data}
+        )
 
     async def get_template(self, **query) -> Template:
         """

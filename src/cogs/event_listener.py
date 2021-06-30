@@ -58,8 +58,8 @@ class Events(commands.Cog):
             description = error.args[0]
         elif isinstance(error, commands.errors.CommandOnCooldown):
             description = (
-                "This command is on cooldown.",
-                f"Please try again in `{error.retry_after:.2f}s`.",
+                "This command is on cooldown."
+                f"Please try again in `{error.retry_after:.2f}s`."
             )
         else:
             unexpected = True

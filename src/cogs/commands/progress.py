@@ -36,15 +36,15 @@ class ProgressCommand(commands.Cog):
             )
             if template is None:
                 raise UserError(f"{template_name} isn't a valid template name.")
-        progress_array, (completed_pixels, total_pixels) = await utils.progress(
+        progress_array, progress = await utils.measure_progress(
             canvas=canvas, template=template
         )
         image = await PalettizedImage(progress_array).render(
             [(255, 0, 0, 255), (0, 255, 0, 255)]
         )
         description = (
-            f"{100*completed_pixels/total_pixels:.1f}% complete"
-            f" ({completed_pixels}/{total_pixels} pixels)."
+            f"{progress.percentage:.1f}% complete"
+            f" ({progress.correct}/{progress.total} pixels)."
         )
         embed = discord.Embed(
             title="Progress", description=description, color=EMBED_COLOR

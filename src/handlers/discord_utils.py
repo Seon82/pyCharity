@@ -56,7 +56,7 @@ async def template_preview(template, bot, canvas, embed_color):
     owner_name = await get_owner_name(template.scope, template.owner, bot)
     embed = discord.Embed(
         title=template.name,
-        description=f"**Owner:** {owner_name}",
+        description=f"**Owner:** {owner_name}\n**Progress:** {template.progress.percentage:.1f}%",
         color=embed_color,
         url=template.url,
     )
