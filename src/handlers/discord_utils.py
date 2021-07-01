@@ -116,12 +116,15 @@ async def render_list(bot, templates: List[Dict[str, list]], embed_color: int):
         if len(templates[scope]) > 0:
             total_description += f"**{scope.capitalize()} templates**:\n"
             for template in templates[scope]:
-                owner_name = await get_owner_name(scope, template["owner"], bot)
+                owner_name = await get_owner_name(
+                    template["scope"], template["owner"], bot
+                )
                 progress = round(Progress(**template["progress"]).percentage, 1)
                 total_description += (
                     f"• **[{template['name']}]({template['url']})**"
                     f" ({progress}%), by {owner_name}\n"
                 )
+            total_description += "\n"
     if total_description == "":
         total_description = "No templates are being tracked yet."
     embed = discord.Embed(color=embed_color, description=total_description)
