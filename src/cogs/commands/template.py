@@ -29,7 +29,7 @@ name_option = create_option(
 
 sort_option = create_option(
     name="sort",
-    description="Sort by progress order: 'up' or 'down'",
+    description="Sort by progress order: 'up', 'down' or 'pl' (pixels left)",
     option_type=3,
     required=False,
 )
@@ -151,12 +151,20 @@ class TemplateCommand(commands.Cog):
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def _list(self, ctx: SlashContext, sort: Optional[str] = None):
         await ctx.defer()
-        if sort == "":
-            sort = None
+        display_progress_pixels = False
         if not sort is None:
             sort = sort.lower()
-            if not sort in ["up", "down"]:
-                raise UserError("The sort order must be `up` or `down`.")
+            if sort in ["up", "down"]:
+                sorter = lambda info: utils.Progress(**info["progress"]).percentage
+                reverse_order = sort == "down"
+            elif sort in ["pl", "pixels left"]:
+                sorter = lambda info: utils.Progress(**info["progress"]).remaining
+                reverse_order = True
+                display_progress_pixels = True
+            else:
+                raise UserError(
+                    "The sort order must be `up`, `down` or `pl` (pixels left)."
+                )
         scopes = ["private", "global", "faction"]
         templates = {scope: [] for scope in scopes}
         # Only fetch the metadata and not the image
@@ -171,12 +179,13 @@ class TemplateCommand(commands.Cog):
             elif info["scope"] != "private":
                 templates["global"].append(info)
         if sort:
-            sorter = lambda info: utils.Progress(**info["progress"]).percentage
             templates = {
-                scope: sorted(temps, key=sorter, reverse=sort == "down")
+                scope: sorted(temps, key=sorter, reverse=reverse_order)
                 for scope, temps in templates.items()
             }
-        embed = await render_list(self.bot, templates, EMBED_COLOR)
+        embed = await render_list(
+            self.bot, templates, display_progress_pixels, EMBED_COLOR
+        )
         await ctx.send(embed=embed)
 
     @cog_ext.cog_subcommand(

@@ -40,6 +40,7 @@ class HelpCommand(commands.Cog):
             "template list": (
                 "`/template list {sort}`: Show all templates in the global tracker! "
                 " Set sort to `up` or `down` to order by ascending or descending progress."
+                " Set sort to `pl` (pixels left) to order by remaining pixels."
             ),
             "template show": (
                 "`/template view <name>`: Display a preview of a template from the"

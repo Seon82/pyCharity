@@ -104,12 +104,19 @@ async def ask_alternatives(ctx, bot, buttons: list, timeout: int = 20, **kwargs)
     return button_ctx
 
 
-async def render_list(bot, templates: List[Dict[str, list]], embed_color: int):
+async def render_list(
+    bot,
+    templates: List[Dict[str, list]],
+    display_progress_pixels: bool,
+    embed_color: int,
+):
     """
     Generate an embed representing a template list.
 
     :param templates: A dictionary mapping category names
     to lists of template info (dicts).
+    :param display_progress_pixels: Whether to display progress as a pixel count
+    or a percentage.
     """
     total_description = ""
     for scope in templates.keys():
@@ -119,10 +126,14 @@ async def render_list(bot, templates: List[Dict[str, list]], embed_color: int):
                 owner_name = await get_owner_name(
                     template["scope"], template["owner"], bot
                 )
-                progress = round(Progress(**template["progress"]).percentage, 1)
+                if display_progress_pixels:
+                    progress = Progress(**template["progress"])
+                    progress_txt = f"{progress.remaining} left"
+                else:
+                    progress_txt = f"{Progress(**template['progress']).percentage:.1f}%"
                 total_description += (
                     f"• **[{template['name']}]({template['url']})**"
-                    f" ({progress}%), by {owner_name}\n"
+                    f" ({progress_txt}), by {owner_name}\n"
                 )
             total_description += "\n"
     if total_description == "":

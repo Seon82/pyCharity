@@ -35,7 +35,9 @@ class ProgressCommand(commands.Cog):
                 name=template_name, canvas_code=canvas.info["canvasCode"]
             )
             if template is None:
-                raise UserError(f"{template_name} isn't a valid template name.")
+                raise UserError(f"`{template_name}` isn't a valid template name.")
+            if template.scope == "private" and ctx.author_id != template.owner:
+                raise UserError("This template is private.")
         progress = await utils.compute_progress(
             canvas=canvas, template=template, compute_array=True
         )

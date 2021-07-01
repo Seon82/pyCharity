@@ -107,6 +107,13 @@ class Progress:
         """
         return 100 * self.correct / self.total
 
+    @property
+    def remaining(self):
+        """
+        Get remaining pixels.
+        """
+        return self.total - self.correct
+
     def to_dict(self):
         """
         Serialize the object.
