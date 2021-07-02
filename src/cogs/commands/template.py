@@ -56,6 +56,8 @@ class TemplateCommand(commands.Cog):
             name, canvas_code=canvas.info["canvasCode"]
         ):
             raise UserError("A template with this name already exists.")
+        if name == "combo":
+            raise UserError("This name is reserved.")
         base_template = await BaseTemplate.from_url(url, canvas=canvas)
         question = f"Should I add `{name}` to the public tracker?"
         buttons = [
@@ -177,7 +179,10 @@ class TemplateCommand(commands.Cog):
             elif info["scope"] == "faction" and ctx.guild_id == info["owner"]:
                 templates["faction"].append(info)
             elif info["scope"] != "private":
-                templates["global"].append(info)
+                if info["name"] == "combo":  # Show combo first
+                    templates["global"].insert(0, info)
+                else:
+                    templates["global"].append(info)
         if sort:
             templates = {
                 scope: sorted(temps, key=sorter, reverse=reverse_order)

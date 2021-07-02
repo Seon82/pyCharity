@@ -1,7 +1,9 @@
 import logging
 from discord.ext import tasks, commands
 from handlers.pxls.utils import compute_progress
-from handlers.setup import canvas, ws_client, template_manager
+from handlers.pxls import Template
+from handlers.setup import canvas, ws_client, template_manager, base_url
+from handlers.pxls.layer import layer
 
 logger = logging.getLogger("pyCharity." + __name__)
 
@@ -24,6 +26,7 @@ class Clock(commands.Cog):
     @tasks.loop(minutes=5)
     async def update_board(self):
         """Update the canvas info and template progress periodically."""
+        # Update canvas
         try:
             await canvas.update_info()
             ws_client.pause()
@@ -33,6 +36,7 @@ class Clock(commands.Cog):
             ws_client.resume()
         except Exception as error:
             logger.warning(f"Error while fetching board: {error}")
+        # Update progress
         try:
             templates = template_manager.get_templates(
                 canvas_code=canvas.info["canvasCode"]
@@ -45,6 +49,35 @@ class Clock(commands.Cog):
             logger.debug("Updated template progress.")
         except Exception as error:
             logger.warning(f"Error while updating template progress: {error}")
+        # Generate combo
+        combo, combo_exists = None, False
+        templates = template_manager.get_templates(
+            canvas_code=canvas.info["canvasCode"], scope={"$ne": "private"}
+        )
+        async for template in templates:
+            if combo is None:
+                combo = template
+            elif template.name == "combo":
+                combo_exists = True
+            else:
+                combo = await layer(
+                    canvas.board.width, canvas.board.height, combo, template
+                )
+        if not combo is None:
+            owner = self.bot.user.id
+            combo = await Template.from_base(
+                base_template=combo,
+                name="combo",
+                url=base_url,
+                owner=owner,
+                canvas=canvas,
+                scope="global",
+            )
+            if combo_exists:
+                await template_manager.update_template(combo)
+            else:
+                await template_manager.add_template(combo)
+            logger.debug("Generated combo.")
 
     @update_board.before_loop
     async def before(self):
