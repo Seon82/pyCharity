@@ -67,9 +67,7 @@ async def template_preview(template, bot, canvas, embed_color):
 
 
 def button(
-    label: str,
-    custom_id: Optional[str] = None,
-    style: str = "blurple",
+    label: str, custom_id: Optional[str] = None, style: str = "blurple", **kwargs
 ):
     """
     Create and return a button component.
@@ -78,11 +76,13 @@ def button(
     :param style: A ButtonStyle attribute.
     """
     return manage_components.create_button(
-        style=getattr(ButtonStyle, style), label=label, custom_id=custom_id
+        style=getattr(ButtonStyle, style), label=label, custom_id=custom_id, **kwargs
     )
 
 
-async def ask_alternatives(ctx, bot, buttons: list, timeout: int = 20, **kwargs):
+async def ask_alternatives(
+    ctx, bot, buttons: list, timeout: int = 20, raise_error=True, **kwargs
+):
     """
     Ask a  question.
     """
@@ -99,9 +99,11 @@ async def ask_alternatives(ctx, bot, buttons: list, timeout: int = 20, **kwargs)
         button_ctx = await manage_components.wait_for_component(
             bot, components=action_row, timeout=timeout
         )
+        return button_ctx
     except asyncio.TimeoutError:
-        raise UserError("Timed out.")
-    return button_ctx
+        if raise_error:
+            raise UserError("Timed out.")
+        await ctx.message.edit(components=[])
 
 
 async def render_list(

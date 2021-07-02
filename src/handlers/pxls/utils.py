@@ -1,11 +1,11 @@
 import math
 from io import BytesIO
 from typing import Optional
+from urllib.parse import urljoin, urlencode
 from PIL import Image
 import aiohttp
 from aioify import aioify
 import numpy as np
-from .image import PalettizedImage
 
 
 class BadResponseError(Exception):
@@ -25,7 +25,7 @@ async def query(url, content_type):
                     return await response.json()
                 if content_type == "binary":
                     return await response.read()
-            raise BadResponseError("Query returned {r.status} code.")
+            raise BadResponseError("Query returned {response.status} code.")
 
 
 def hex2rgba(hex_num: str):
@@ -59,28 +59,6 @@ def check_template_link(url):
         if not elmt in url:
             return False
     return True
-
-
-@aioify
-def layer(canvas_width: int, canvas_height: int, *templates) -> PalettizedImage:
-    """
-    Sequentially layer each of the received templates, and return the
-    corresponding PalettizedImage.
-    """
-    background = np.full((canvas_height, canvas_width), 255, np.uint8)
-    max_x, max_y = 0, 0
-    min_x, min_y = canvas_width, canvas_height
-    for template in templates:
-        ox, oy = template.ox, template.oy
-        mask = template.image != 255
-        background[oy : oy + template.height, ox : ox + template.width][
-            mask
-        ] = template.image[mask]
-        min_x = min(ox, min_x)
-        min_y = min(oy, min_y)
-        max_x = max(ox + template.width, max_x)
-        max_y = max(oy + template.height, max_y)
-    return PalettizedImage(background[min_y:max_y, min_x:max_x])
 
 
 class Progress:
@@ -147,3 +125,45 @@ def compute_progress(canvas, template, compute_array=False) -> Progress:
         return Progress(completed_pixels, total_pixels, progress_array)
 
     return Progress(completed_pixels, total_pixels)
+
+
+@aioify
+def style_dotted(image: Image.Image, block_size=3) -> Image.Image:
+    """
+    Generate a dotted style template image from a template.
+
+    :param block_size: The size of the transparent pixel blocks
+    the origin pixel sits in the middle of. Better-looking results
+    with an odd number.
+    """
+    img = np.asarray(image)
+    styled_img = np.zeros(
+        (img.shape[0] * block_size, img.shape[1] * block_size, 4), dtype=np.uint8
+    )
+    idx_y = [block_size // 2 + i for i in range(0, styled_img.shape[0], block_size)]
+    idx_x = [block_size // 2 + i for i in range(0, styled_img.shape[1], block_size)]
+    idx = tuple(np.meshgrid(idx_y, idx_x, indexing="ij"))
+    styled_img[idx] = img
+    return Image.fromarray(styled_img, mode="RGBA")
+
+
+def generate_template_url(template, base_url: str, styled_url: str) -> str:
+    """
+    Generate a pxls.space template link.
+
+    :param template: The BaseTemplate we're generating the link for.
+    :param base_url: The website base url (eg: https://pxls.space)
+    :param styled_url: url of the styled template image.
+    """
+    center_x = template.width // 2 + template.ox
+    center_y = template.height // 2 + template.oy
+    params = {
+        "x": center_x,
+        "y": center_y,
+        "ox": template.ox,
+        "oy": template.oy,
+        "oo": 1,
+        "template": styled_url,
+        "tw": template.width,
+    }
+    return urljoin(base_url, "#" + urlencode(params))

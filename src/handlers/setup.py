@@ -3,6 +3,7 @@ import asyncio
 import logging
 from dotenv import load_dotenv
 from .pxls import Canvas, TemplateManager
+from .imgur_uploader import ImgurUploader
 from .websocket import WebsocketClient
 
 logger = logging.getLogger("pyCharity." + __name__)
@@ -31,3 +32,6 @@ template_manager = TemplateManager(os.getenv("DB_CONNECTION"))
 # Websocket
 ws_client = WebsocketClient(uri=os.getenv("PXLS_WEBSOCKET"), canvas=canvas)
 ws_client.start()
+
+# Imgur client
+image_uploader = ImgurUploader(os.getenv("IMGUR_CLIENT_ID"))
