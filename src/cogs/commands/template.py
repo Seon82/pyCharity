@@ -174,7 +174,11 @@ class TemplateCommand(commands.Cog):
             projection={"image": False}, canvas_code=canvas.info["canvasCode"]
         )
         async for info in template_info:
-            if info["scope"] == "private" and ctx.guild is None:  # In DMs
+            if (
+                info["scope"] == "private"
+                and ctx.author_id == info["owner"]
+                and ctx.guild is None
+            ):  # In DMs
                 templates["private"].append(info)
             elif info["scope"] == "faction" and ctx.guild_id == info["owner"]:
                 templates["faction"].append(info)
