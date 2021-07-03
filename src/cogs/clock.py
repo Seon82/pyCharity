@@ -50,34 +50,37 @@ class Clock(commands.Cog):
         except Exception as error:
             logger.warning(f"Error while updating template progress: {error}")
         # Generate combo
-        combo, combo_exists = None, False
-        templates = template_manager.get_templates(
-            canvas_code=canvas.info["canvasCode"], scope={"$ne": "private"}
-        )
-        async for template in templates:
-            if combo is None:
-                combo = template
-            elif template.name == "combo":
-                combo_exists = True
-            else:
-                combo = await layer(
-                    canvas.board.width, canvas.board.height, combo, template
-                )
-        if not combo is None:
-            owner = self.bot.user.id
-            combo = await Template.from_base(
-                base_template=combo,
-                name="combo",
-                url=base_url,
-                owner=owner,
-                canvas=canvas,
-                scope="global",
+        try:
+            combo, combo_exists = None, False
+            templates = template_manager.get_templates(
+                canvas_code=canvas.info["canvasCode"], scope={"$ne": "private"}
             )
-            if combo_exists:
-                await template_manager.update_template(combo)
-            else:
-                await template_manager.add_template(combo)
-            logger.debug("Generated combo.")
+            async for template in templates:
+                if combo is None:
+                    combo = template
+                elif template.name == "combo":
+                    combo_exists = True
+                else:
+                    combo = await layer(
+                        canvas.board.width, canvas.board.height, combo, template
+                    )
+            if not combo is None:
+                owner = self.bot.user.id
+                combo = await Template.from_base(
+                    base_template=combo,
+                    name="combo",
+                    url=base_url,
+                    owner=owner,
+                    canvas=canvas,
+                    scope="global",
+                )
+                if combo_exists:
+                    await template_manager.update_template(combo)
+                else:
+                    await template_manager.add_template(combo)
+                logger.debug("Generated combo.")
+        except Exception as error:
+            logger.warning(f"Error while generating combo: {error}")
 
     @update_board.before_loop
     async def before(self):
