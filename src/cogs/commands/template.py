@@ -55,7 +55,10 @@ class TemplateCommand(commands.Cog):
         if await template_manager.check_name_exists(
             name, canvas_code=canvas.info["canvasCode"]
         ):
-            raise UserError("A template with this name already exists.")
+            raise UserError(
+                "A template with this name already exists."
+                "If it doesn't appear in the global tracker, it means it's private."
+            )
         if name == "combo":
             raise UserError("This name is reserved.")
         base_template = await BaseTemplate.from_url(url, canvas=canvas)
