@@ -21,6 +21,9 @@ else:  # Empty string
 # Embed color
 EMBED_COLOR = int(os.getenv("EMBED_COLOR"), 16)
 
+# Invite link
+invite_url = os.getenv("INVITE_LINK")
+
 # Canvas
 base_url = os.getenv("PXLS_URL")
 canvas = Canvas(base_url=base_url)

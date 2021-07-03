@@ -1,7 +1,9 @@
 import discord
 from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
-from handlers.setup import GUILD_IDS, EMBED_COLOR
+from discord_slash.utils.manage_components import create_actionrow
+from handlers.setup import GUILD_IDS, EMBED_COLOR, invite_url
+from handlers.discord_utils import button
 
 
 class HelpCommand(commands.Cog):
@@ -65,7 +67,8 @@ class HelpCommand(commands.Cog):
         embed.set_footer(
             text="<param> is a mandatory parameter. {param} is an optional parameter."
         )
-        await ctx.send(embed=embed)
+        invite_button = button("Invite link", style="URL", url=invite_url)
+        await ctx.send(embed=embed, components=[create_actionrow(invite_button)])
 
 
 def setup(bot):
