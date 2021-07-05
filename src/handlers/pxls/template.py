@@ -3,9 +3,14 @@ from urllib.parse import parse_qs
 from PIL import Image
 import numpy as np
 from aioify import aioify
+import pyximport
 from .canvas import Canvas
 from .image import PalettizedImage
 from .utils import download_image, compute_progress, Progress
+
+# pylint: disable = import-error, wrong-import-position
+pyximport.install(setup_args={"include_dirs": np.get_include()})
+from .detemplatize import fast_detemplatize
 
 
 class BaseTemplate(PalettizedImage):
@@ -77,22 +82,9 @@ class BaseTemplate(PalettizedImage):
         if true_width <= 0 or img_raw.width // true_width == 1:  # Nothing to do :)
             return img_raw
         block_size = img_raw.width // true_width
-        img_raw = np.asarray(img_raw)
-
-        blocks = img_raw.reshape(
-            (
-                img_raw.shape[0] // block_size,
-                block_size,
-                img_raw.shape[1] // block_size,
-                block_size,
-                4,
-            )
-        ).swapaxes(1, 2)
-        # block -> pixel conversion
-        img = np.max(blocks, axis=(2, 3))
-        # Transparency sanitation
-        transparency = img[:, :, 3]
-        transparency[transparency < 255] = 0
+        true_height = img_raw.width // block_size
+        img_array = np.array(img_raw, dtype=np.uint8)
+        img = fast_detemplatize(img_array, true_height, true_width, block_size)
         return Image.fromarray(img, mode="RGBA")
 
     @staticmethod
