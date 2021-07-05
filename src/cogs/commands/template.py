@@ -29,9 +29,10 @@ name_option = create_option(
 
 sort_option = create_option(
     name="sort",
-    description="Sort by progress order: 'up', 'down' or 'pl' (pixels left)",
+    description="Sort by progress order: 'up', 'down' or 'pixels left'",
     option_type=3,
     required=False,
+    choices=["percentage up", "percentage down", "pixels left"],
 )
 
 
@@ -158,18 +159,14 @@ class TemplateCommand(commands.Cog):
         await ctx.defer()
         display_progress_pixels = False
         if not sort is None:
-            sort = sort.lower()
-            if sort in ["up", "down"]:
+            if sort in ["percentage up", "percentage down"]:
                 sorter = lambda info: utils.Progress(**info["progress"]).percentage
                 reverse_order = sort == "down"
-            elif sort in ["pl", "pixels left"]:
+            elif sort == "pixels left":
                 sorter = lambda info: utils.Progress(**info["progress"]).remaining
                 reverse_order = True
                 display_progress_pixels = True
-            else:
-                raise UserError(
-                    "The sort order must be `up`, `down` or `pl` (pixels left)."
-                )
+
         scopes = ["private", "global", "faction"]
         templates = {scope: [] for scope in scopes}
         # Only fetch the metadata and not the image

@@ -32,7 +32,7 @@ class HelpCommand(commands.Cog):
                 " You can use template links or names from the tracker."
             ),
             "template add": (
-                "`/template add <name> <url> {faction=False}`: Add a template to the"
+                "`/template add <name> <url>`: Add a template to the"
                 " tracker under a chosen name."
             ),
             "template remove": (
@@ -40,9 +40,8 @@ class HelpCommand(commands.Cog):
                 " tracker."
             ),
             "template list": (
-                "`/template list {sort}`: Show all templates in the global tracker! "
-                " Set sort to `up` or `down` to order by ascending or descending progress."
-                " Set sort to `pl` (pixels left) to order by remaining pixels."
+                "`/template list {percentage up|percentage down|pixels left}`:"
+                "Show all templates in the global tracker! "
             ),
             "template show": (
                 "`/template view <name>`: Display a preview of a template from the"
