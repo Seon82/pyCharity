@@ -11,7 +11,7 @@ def fast_detemplatize(np.uint8_t[:, :, :] array, int true_height, int true_width
     result = np.zeros((true_height, true_width,4), dtype=np.uint8)
     cdef np.uint8_t[:, :, :] result_view = result
     
-    cdef np.uint8_t red, green, blue, alpha
+    cdef np.uint8_t alpha
     
     cdef int x, y, b_y, b_x
 
@@ -24,6 +24,6 @@ def fast_detemplatize(np.uint8_t[:, :, :] array, int true_height, int true_width
                 result_view[b_y,b_x,0] = array[y, x, 0]
                 result_view[b_y,b_x,1] = array[y, x, 1]
                 result_view[b_y,b_x,2] = array[y, x, 2]
-                result_view[b_y,b_x,3] = alpha
+                result_view[b_y,b_x,3] = 255
 
     return result
