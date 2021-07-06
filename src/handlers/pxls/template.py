@@ -96,7 +96,6 @@ class BaseTemplate(PalettizedImage):
         """
         palette = palette.copy()
         palette.append((0, 0, 0, 0))
-        palette = np.array(palette, dtype=np.uint8)
         # Don't try to vectorize this, using np.stack and argmin
         # uses a crazy amount of memory and is a tad slower on real images.
         best_match_idx = np.zeros(rendered_array.shape[:2], dtype=np.uint8)
