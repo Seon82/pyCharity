@@ -65,7 +65,7 @@ def image2buffer(image: np.ndarray) -> BytesIO:
     """
     image_bgr = cv2.cvtColor(image, cv2.COLOR_RGBA2BGRA)
     success, img_buffer = cv2.imencode(".png", image_bgr)
-    assert success == True
+    assert success is True
     return BytesIO(img_buffer)
 
 
