@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pycharity"
-version = "1.0beta1"
+version = "1.0beta2"
 description = "A python port of Mikarific's charity bot."
 authors = ["Seon"]
 
