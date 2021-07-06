@@ -2,8 +2,8 @@ import math
 from io import BytesIO
 from typing import Optional
 from urllib.parse import urljoin, urlencode
-from PIL import Image
 import aiohttp
+import cv2
 from aioify import aioify
 import numpy as np
 
@@ -43,12 +43,30 @@ def cooldown(num_users: int):
     return 2.5 * math.sqrt(num_users + 11.96) + 6.5
 
 
-async def download_image(url: str) -> Image.Image:
+async def download_image(url: str) -> np.ndarray:
     """
     Download an image from a given url as an rgba PIL image.
     """
     response = await query(url, "binary")
-    return Image.open(BytesIO(response)).convert("RGBA")
+    return buffer2image(BytesIO(response))
+
+
+def buffer2image(buffer: BytesIO) -> np.ndarray:
+    """
+    Convert a data buffer to a RGBA numpy array.
+    """
+    res_bgr = cv2.imdecode(np.frombuffer(buffer.read(), np.uint8), cv2.IMREAD_UNCHANGED)
+    return cv2.cvtColor(res_bgr, cv2.COLOR_BGRA2RGBA)
+
+
+def image2buffer(image: np.ndarray) -> BytesIO:
+    """
+    Convert a RGBA numpy array to a data buffer.
+    """
+    image_bgr = cv2.cvtColor(image, cv2.COLOR_RGBA2BGRA)
+    success, img_buffer = cv2.imencode(".png", image_bgr)
+    assert success == True
+    return BytesIO(img_buffer)
 
 
 def check_template_link(url):
@@ -128,7 +146,7 @@ def compute_progress(canvas, template, compute_array=False) -> Progress:
 
 
 @aioify
-def style_dotted(image: Image.Image, block_size=3) -> Image.Image:
+def style_dotted(image: np.ndarray, block_size=3) -> np.ndarray:
     """
     Generate a dotted style template image from a template.
 
@@ -144,7 +162,7 @@ def style_dotted(image: Image.Image, block_size=3) -> Image.Image:
     idx_x = [block_size // 2 + i for i in range(0, styled_img.shape[1], block_size)]
     idx = tuple(np.meshgrid(idx_y, idx_x, indexing="ij"))
     styled_img[idx] = img
-    return Image.fromarray(styled_img, mode="RGBA")
+    return styled_img
 
 
 def generate_template_url(template, base_url: str, styled_url: str) -> str:

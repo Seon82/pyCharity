@@ -1,12 +1,11 @@
-import io
 import asyncio
 from typing import Optional, Dict, List
 import discord
 from discord_slash.context import ComponentContext
 from discord_slash.utils import manage_components
 from discord_slash.model import ButtonStyle
-from PIL import Image
-from .pxls.utils import Progress
+import numpy as np
+from .pxls.utils import Progress, image2buffer
 
 
 class UserError(Exception):
@@ -17,22 +16,17 @@ class UserError(Exception):
     """
 
 
-def attach_image(
-    image: Image.Image, embed: discord.Embed, compression_level: int = 6
-) -> discord.File:
+def attach_image(image: np.ndarray, embed: discord.Embed) -> discord.File:
     """
-    Attach a PIL image to a discord embed.
+    Attach a rgba image array to a discord embed.
 
     :param image: The image to attach.
     :param embed: The embed it should be attached to.
-    :param compression_level: The compression level PIL should use when saving oh png.
     :return: A discord.file object that should be sent with the embed.
     """
-    with io.BytesIO() as buffer:
-        image.save(buffer, format="png", compression_level=compression_level)
-        buffer.seek(0)
-        file = discord.File(buffer, filename="image.png")
-        embed.set_image(url="attachment://image.png")
+    buffer = image2buffer(image)
+    file = discord.File(buffer, filename="image.png")
+    embed.set_image(url="attachment://image.png")
     return file
 
 

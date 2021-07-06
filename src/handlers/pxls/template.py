@@ -1,6 +1,5 @@
 from typing import Tuple, Dict, List
 from urllib.parse import parse_qs
-from PIL import Image
 import numpy as np
 from aioify import aioify
 import pyximport
@@ -9,7 +8,7 @@ from .image import PalettizedImage
 from .utils import download_image, compute_progress, Progress
 
 # pylint: disable = import-error, wrong-import-position
-pyximport.install(setup_args={"include_dirs": np.get_include()})
+pyximport.install()
 from .detemplatize import fast_detemplatize
 
 
@@ -63,7 +62,7 @@ class BaseTemplate(PalettizedImage):
     @staticmethod
     async def process_link(
         url: str,
-    ) -> Tuple[Dict[str, List[str]], Image.Image]:
+    ) -> Tuple[Dict[str, List[str]], np.ndarray]:
         """
         Process a pxls.space template link and download the asociated image.
 
@@ -75,28 +74,27 @@ class BaseTemplate(PalettizedImage):
 
     @staticmethod
     @aioify
-    def detemplatize(img_raw: Image.Image, true_width: int) -> Image.Image:
+    def detemplatize(img_raw: np.ndarray, true_width: int) -> np.ndarray:
         """
         Convert a styled template image back to its original version.
         """
-        if true_width <= 0 or img_raw.width // true_width == 1:  # Nothing to do :)
+        if true_width <= 0 or img_raw.shape[1] // true_width == 1:  # Nothing to do :)
             return img_raw
-        block_size = img_raw.width // true_width
-        true_height = img_raw.width // block_size
+        block_size = img_raw.shape[1] // true_width
+        true_height = img_raw.shape[0] // block_size
         img_array = np.array(img_raw, dtype=np.uint8)
         img = fast_detemplatize(img_array, true_height, true_width, block_size)
-        return Image.fromarray(img, mode="RGBA")
+        return img
 
     @staticmethod
     @aioify
-    def reduce(rendered_image: Image.Image, palette) -> np.ndarray:
+    def reduce(rendered_array: np.ndarray, palette) -> np.ndarray:
         """
         Convert a rendered image to its palettized equivalent.
         Colors that aren't in the palette are automatically mappped to their
         nearest equivalent.
         """
         palette = palette.copy()
-        rendered_array = np.asarray(rendered_image)
         palette.append((0, 0, 0, 0))
         palette = np.array(palette, dtype=np.uint8)
         # Don't try to vectorize this, using np.stack and argmin
