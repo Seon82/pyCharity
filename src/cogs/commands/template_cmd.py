@@ -29,10 +29,10 @@ name_option = create_option(
 
 sort_option = create_option(
     name="sort",
-    description="Sort by progress order: 'up', 'down' or 'pixels left'",
+    description="Sort by progress order: '% up', '% down' or 'pixels left'",
     option_type=3,
     required=False,
-    choices=["percentage up", "percentage down", "pixels left"],
+    choices=["% up", "% down", "pixels left"],
 )
 
 
@@ -159,7 +159,7 @@ class TemplateCommand(commands.Cog):
         await ctx.defer()
         display_progress_pixels = False
         if not sort is None:
-            if sort in ["percentage up", "percentage down"]:
+            if sort in ["% up", "% down"]:
                 sorter = lambda template: template.progress.percentage
                 reverse_order = sort == "down"
             elif sort == "pixels left":

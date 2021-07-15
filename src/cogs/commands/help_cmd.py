@@ -40,7 +40,7 @@ class HelpCommand(commands.Cog):
                 " tracker."
             ),
             "template list": (
-                "`/template list {percentage up|percentage down|pixels left}`:"
+                "`/template list {% up|% down|pixels left}`:"
                 "Show all templates in the global tracker! "
             ),
             "template show": (
