@@ -1,7 +1,7 @@
 from urllib.parse import urljoin
 import numpy as np
 from handlers.image import hex2rgba, PalettizedImage
-from .utils import query
+from handlers.pxls.utils import query
 
 
 class Canvas:

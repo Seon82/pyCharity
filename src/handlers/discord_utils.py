@@ -6,7 +6,7 @@ from discord_slash.utils import manage_components
 from discord_slash.model import ButtonStyle
 import numpy as np
 from handlers.image import image2buffer
-from .pxls import Progress
+from handlers.pxls import Progress
 
 
 class UserError(Exception):

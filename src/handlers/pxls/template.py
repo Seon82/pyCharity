@@ -9,7 +9,7 @@ from .progress import compute_progress, Progress
 
 # pylint: disable = import-error, wrong-import-position
 pyximport.install()
-from .detemplatize import fast_detemplatize
+from handlers.pxls.detemplatize import fast_detemplatize
 
 
 class BaseTemplate(PalettizedImage):
