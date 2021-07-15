@@ -1,33 +1,12 @@
-import pickle
-from bson.binary import Binary
-import numpy as np
-from motor.motor_asyncio import AsyncIOMotorClient
-from .progress import Progress
-from .template import Template
+from handlers.pxls import Template, Progress
+from handlers.database import DatabaseConnector
 
 
-class TemplateManager:
+class TemplateManager(DatabaseConnector):
     """
     An helper used to ease interactions with the templates stored
     in the mongodb databse.
     """
-
-    def __init__(self, mongo_uri: str):
-        """
-        :param mongo_uri: The mongodb's uri, ie: mongodb://127.0.0.1:27017/
-        """
-        mongo_client = AsyncIOMotorClient(mongo_uri)
-        self.collection = mongo_client.pycharity.templates
-
-    @staticmethod
-    def _serialize(array: np.ndarray) -> Binary:
-        """Convert a numpy array to a binary blob."""
-        return Binary(pickle.dumps(array, protocol=2), subtype=128)
-
-    @staticmethod
-    def _deserialize(data: Binary) -> np.ndarray:
-        """Retrieve a numpy array from a binary blob."""
-        return pickle.loads(data)
 
     def _doc2template(self, document):
         """
@@ -100,21 +79,6 @@ class TemplateManager:
         if await self.collection.find_one(query, {"image": False}):
             return True
         return False
-
-    # pylint: disable = dangerous-default-value
-    async def find(self, projection={}, **query):
-        """
-        Get a generator returning data from an arbitrary find query.
-        """
-        async for document in self.collection.find(query, projection):
-            yield document
-
-    # pylint: disable = dangerous-default-value
-    async def find_one(self, projection={}, **query):
-        """
-        Get the data from an arbitrary find query.
-        """
-        return await self.collection.find_one(query, projection)
 
     async def get_templates(self, **query):
         """

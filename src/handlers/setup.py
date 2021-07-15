@@ -2,9 +2,10 @@ import os
 import asyncio
 import logging
 from dotenv import load_dotenv
-from .pxls import Canvas, TemplateManager
-from .imgur_uploader import ImgurUploader
-from .websocket import WebsocketClient
+from handlers.pxls import Canvas
+from handlers.database import TemplateManager
+from handlers.imgur_uploader import ImgurUploader
+from handlers.websocket import WebsocketClient
 
 logger = logging.getLogger("pyCharity." + __name__)
 logger.info("Setting up...")
