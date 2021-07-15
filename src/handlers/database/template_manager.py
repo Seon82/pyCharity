@@ -1,3 +1,4 @@
+from typing import Iterator
 from handlers.pxls import Template, Progress
 from handlers.database import DatabaseConnector
 
@@ -8,11 +9,11 @@ class TemplateManager(DatabaseConnector):
     in the mongodb databse.
     """
 
-    def _doc2template(self, document):
+    def _doc2template(self, document) -> Template:
         """
-        Convert a document to a template.
+        Convert a document to a Template.
         """
-        array = self._deserialize(document["image"])
+        array = self._deserialize(document["image"]) if "image" in document else []
         return Template(
             array=array,
             ox=document["ox"],
@@ -25,7 +26,7 @@ class TemplateManager(DatabaseConnector):
             progress=Progress(**document["progress"]),
         )
 
-    def _template2doc(self, template: Template):
+    def _template2doc(self, template: Template) -> dict:
         """
         Convert a template to a document.
         """
@@ -61,16 +62,6 @@ class TemplateManager(DatabaseConnector):
             {"name": template.name, "canvas_code": template.canvas_code}, {"$set": data}
         )
 
-    async def get_template(self, **query) -> Template:
-        """
-        Find a template in the database matching the query.
-        ex: self.get_template(name='Seon', owner=123456789)
-        """
-        document = await self.collection.find_one(query)
-        if document is None:
-            return None
-        return self._doc2template(document)
-
     async def check_name_exists(self, name, **query):
         """
         Check if a template name already exists.
@@ -80,11 +71,31 @@ class TemplateManager(DatabaseConnector):
             return True
         return False
 
-    async def get_templates(self, **query):
+    async def get_template(self, no_image=False, **query) -> Template:
+        """
+        Find a template in the database matching the query.
+        ex: self.get_template(name='Seon', owner=123456789)
+
+        :param no_image: If set to True, do not retrieve the image attribute
+        for decreased memory usage. The returned template will
+        have an empty list as the image attribute instead.
+        """
+        projection = {"image": False} if no_image else None
+        document = await super().find_one(projection=projection, **query)
+        if document is None:
+            return None
+        return self._doc2template(document)
+
+    async def get_templates(self, no_image=False, **query) -> Iterator[Template]:
         """
         Get a generator returning templates in the database matching the query.
+
+        :param no_image: If set to True, do not retrieve the image attribute
+        for decreased memory usage. The returned template will
+        have an empty list as the image attribute instead.
         """
-        async for document in self.collection.find(query):
+        projection = {"image": False} if no_image else None
+        async for document in super().find(projection=projection, **query):
             yield self._doc2template(document)
 
     async def delete_template(self, **query):

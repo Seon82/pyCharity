@@ -1,4 +1,5 @@
 import pickle
+from typing import Iterator
 from bson.binary import Binary
 from motor.motor_asyncio import AsyncIOMotorClient
 
@@ -27,7 +28,7 @@ class DatabaseConnector:
         return pickle.loads(data)
 
     # pylint: disable = dangerous-default-value
-    async def find(self, projection={}, **query):
+    async def find(self, projection={}, **query) -> Iterator[dict]:
         """
         Get a generator returning data from an arbitrary find query.
         """
@@ -35,7 +36,7 @@ class DatabaseConnector:
             yield document
 
     # pylint: disable = dangerous-default-value
-    async def find_one(self, projection={}, **query):
+    async def find_one(self, projection={}, **query) -> dict:
         """
         Get the data from an arbitrary find query.
         """

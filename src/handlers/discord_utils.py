@@ -6,7 +6,7 @@ from discord_slash.utils import manage_components
 from discord_slash.model import ButtonStyle
 import numpy as np
 from handlers.image import image2buffer
-from handlers.pxls import Progress
+from handlers.pxls.template import Template
 
 
 class UserError(Exception):
@@ -106,7 +106,7 @@ async def ask_alternatives(
 
 async def render_list(
     bot,
-    templates: List[Dict[str, list]],
+    templates: List[Dict[str, List[Template]]],
     display_progress_pixels: bool,
     embed_color: int,
 ):
@@ -114,7 +114,7 @@ async def render_list(
     Generate an embed representing a template list.
 
     :param templates: A dictionary mapping category names
-    to lists of template info (dicts).
+    to lists of templates.
     :param display_progress_pixels: Whether to display progress as a pixel count
     or a percentage.
     """
@@ -123,16 +123,13 @@ async def render_list(
         if len(templates[scope]) > 0:
             total_description += f"**{scope.capitalize()} templates**:\n"
             for template in templates[scope]:
-                owner_name = await get_owner_name(
-                    template["scope"], template["owner"], bot
-                )
+                owner_name = await get_owner_name(template.scope, template.owner, bot)
                 if display_progress_pixels:
-                    progress = Progress(**template["progress"])
-                    progress_txt = f"{progress.remaining} left"
+                    progress_txt = f"{template.progress.remaining} left"
                 else:
-                    progress_txt = f"{Progress(**template['progress']).percentage:.1f}%"
+                    progress_txt = f"{template.progress.percentage:.1f}%"
                 total_description += (
-                    f"• **[{template['name']}]({template['url']})**"
+                    f"• **[{template.name}]({template.url})**"
                     f" ({progress_txt}), by {owner_name}\n"
                 )
             total_description += "\n"

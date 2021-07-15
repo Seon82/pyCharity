@@ -11,7 +11,7 @@ from handlers.discord_utils import (
     button,
     ask_alternatives,
 )
-from handlers.pxls import Template, BaseTemplate, Progress, utils
+from handlers.pxls import Template, BaseTemplate, utils
 
 url_option = create_option(
     name="url",
@@ -104,16 +104,16 @@ class TemplateCommand(commands.Cog):
         await ctx.defer()
         if not utils.check_template_link(url):
             raise UserError("Please provide a valid template link.")
-        template_info = await template_manager.find_one(
-            name=name, projection={"image": False}
+        template = await template_manager.get_template(
+            no_image=True, name=name, canvas_code=canvas.info["canvasCode"]
         )
-        self._check_permissions(ctx, template_info)
+        self._check_permissions(ctx, template)
         template = await Template.from_url(
             url,
             name=name,
-            owner=template_info["owner"],
+            owner=template.owner,
             canvas=canvas,
-            scope=template_info["scope"],
+            scope=template.scope,
         )
         await template_manager.update_template(template)
         file, embed = await template_preview(template, self.bot, canvas, EMBED_COLOR)
@@ -129,13 +129,13 @@ class TemplateCommand(commands.Cog):
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def _remove(self, ctx: SlashContext, name: str):
         # Only fetch the metadata and not the image
-        template_info = await template_manager.find_one(
-            name=name, projection={"image": False}
+        template = await template_manager.get_template(
+            no_image=True, name=name, canvas_code=canvas.info["canvasCode"]
         )
-        self._check_permissions(ctx, template_info)
+        self._check_permissions(ctx, template)
         success = await template_manager.delete_template(
             name=name,
-            owner=template_info["owner"],
+            owner=template.owner,
             canvas_code=canvas.info["canvasCode"],
         )
         if not success:
@@ -160,33 +160,33 @@ class TemplateCommand(commands.Cog):
         display_progress_pixels = False
         if not sort is None:
             if sort in ["percentage up", "percentage down"]:
-                sorter = lambda info: Progress(**info["progress"]).percentage
+                sorter = lambda template: template.progress.percentage
                 reverse_order = sort == "down"
             elif sort == "pixels left":
-                sorter = lambda info: Progress(**info["progress"]).remaining
+                sorter = lambda template: template.progress.remaining
                 reverse_order = True
                 display_progress_pixels = True
 
         scopes = ["private", "global", "faction"]
         templates = {scope: [] for scope in scopes}
         # Only fetch the metadata and not the image
-        template_info = template_manager.find(
-            projection={"image": False}, canvas_code=canvas.info["canvasCode"]
+        template_generator = template_manager.get_templates(
+            no_image=True, canvas_code=canvas.info["canvasCode"]
         )
-        async for info in template_info:
+        async for template in template_generator:
             if (
-                info["scope"] == "private"
-                and ctx.author_id == info["owner"]
+                template.scope == "private"
+                and ctx.author_id == template.owner
                 and ctx.guild is None
             ):  # In DMs
-                templates["private"].append(info)
-            elif info["scope"] == "faction" and ctx.guild_id == info["owner"]:
-                templates["faction"].append(info)
-            elif info["scope"] != "private":
-                if info["name"] == "combo":  # Show combo first
-                    templates["global"].insert(0, info)
+                templates["private"].append(template)
+            elif template.scope == "faction" and ctx.guild_id == template.owner:
+                templates["faction"].append(template)
+            elif template.scope != "private":
+                if template.name == "combo":  # Show combo first
+                    templates["global"].insert(0, template)
                 else:
-                    templates["global"].append(info)
+                    templates["global"].append(template)
         if sort:
             templates = {
                 scope: sorted(temps, key=sorter, reverse=reverse_order)
@@ -218,18 +218,17 @@ class TemplateCommand(commands.Cog):
         await ctx.send(file=file, embed=embed)
 
     @staticmethod
-    def _check_permissions(ctx: SlashContext, template_info: dict):
+    def _check_permissions(ctx: SlashContext, template: Template):
         """
         Check whether a user has permissions over a template.
         Raises a UserError if they don't, returns None otherwise.
 
         :param ctx: The author's command SlashContext.
-        :param template_info: A dictionary containing
-        at least 'owner' and 'scope' information.
+        :param template: A template.
         """
-        if template_info is None:
+        if template is None:
             raise UserError("Invalid template name.")
-        scope, owner = template_info["scope"], template_info["owner"]
+        scope, owner = template.scope, template.owner
         if scope == "faction" and ctx.guild is None:
             raise UserError("A faction template can't be managed from DMs.")
         if scope == "faction" and ctx.guild.id != owner:
