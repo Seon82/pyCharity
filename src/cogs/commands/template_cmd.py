@@ -11,7 +11,7 @@ from handlers.discord_utils import (
     button,
     ask_alternatives,
 )
-from handlers.pxls import Template, BaseTemplate, utils
+from handlers.pxls import Template, BaseTemplate, Progress, utils
 
 url_option = create_option(
     name="url",
@@ -160,10 +160,10 @@ class TemplateCommand(commands.Cog):
         display_progress_pixels = False
         if not sort is None:
             if sort in ["percentage up", "percentage down"]:
-                sorter = lambda info: utils.Progress(**info["progress"]).percentage
+                sorter = lambda info: Progress(**info["progress"]).percentage
                 reverse_order = sort == "down"
             elif sort == "pixels left":
-                sorter = lambda info: utils.Progress(**info["progress"]).remaining
+                sorter = lambda info: Progress(**info["progress"]).remaining
                 reverse_order = True
                 display_progress_pixels = True
 

@@ -2,7 +2,7 @@ import pickle
 from bson.binary import Binary
 import numpy as np
 from motor.motor_asyncio import AsyncIOMotorClient
-from .utils import Progress
+from .progress import Progress
 from .template import Template
 
 

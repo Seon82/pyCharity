@@ -1,7 +1,8 @@
 from io import BytesIO
 import aiohttp
 import numpy as np
-from handlers.pxls.utils import BadResponseError, image2buffer
+from handlers.pxls.utils import BadResponseError
+from handlers.image import image2buffer
 
 
 class ImgurUploader:

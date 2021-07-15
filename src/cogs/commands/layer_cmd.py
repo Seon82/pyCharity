@@ -48,7 +48,7 @@ class LayerCommand(commands.Cog):
                 if template is None:
                     raise UserError(f"{template_name} isn't a valid template name.")
             templates.append(template)
-        layered_template = await layer.layer(
+        layered_template = await layer(
             canvas.board.width, canvas.board.height, *templates
         )
         image = await layered_template.render(canvas.palette)

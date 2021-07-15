@@ -1,9 +1,7 @@
 import logging
 from discord.ext import tasks, commands
-from handlers.pxls.utils import compute_progress
-from handlers.pxls import Template
+from handlers.pxls import compute_progress, Template, layer
 from handlers.setup import canvas, ws_client, template_manager, base_url
-from handlers.pxls.layer import layer
 
 logger = logging.getLogger("pyCharity." + __name__)
 

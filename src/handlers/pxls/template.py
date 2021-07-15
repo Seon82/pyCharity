@@ -3,9 +3,9 @@ from urllib.parse import parse_qs
 import numpy as np
 from aioify import aioify
 import pyximport
+from handlers.image import PalettizedImage, download_image
 from .canvas import Canvas
-from .image import PalettizedImage
-from .utils import download_image, compute_progress, Progress
+from .progress import compute_progress, Progress
 
 # pylint: disable = import-error, wrong-import-position
 pyximport.install()

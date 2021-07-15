@@ -4,7 +4,8 @@ from discord_slash import cog_ext, SlashContext
 from discord_slash.utils.manage_commands import create_option
 from handlers.setup import GUILD_IDS, canvas, EMBED_COLOR, template_manager
 from handlers.discord_utils import UserError, attach_image
-from handlers.pxls import utils, BaseTemplate, PalettizedImage
+from handlers.pxls import utils, BaseTemplate, compute_progress
+from handlers.image import PalettizedImage
 
 
 class ProgressCommand(commands.Cog):
@@ -38,7 +39,7 @@ class ProgressCommand(commands.Cog):
                 raise UserError(f"`{template_name}` isn't a valid template name.")
             if template.scope == "private" and ctx.author_id != template.owner:
                 raise UserError("This template is private.")
-        progress = await utils.compute_progress(
+        progress = await compute_progress(
             canvas=canvas, template=template, compute_array=True
         )
         image = await PalettizedImage(progress.array).render(
