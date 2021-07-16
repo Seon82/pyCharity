@@ -1,4 +1,4 @@
-from typing import Iterator
+from typing import Iterator, List
 from handlers.database import DatabaseConnector
 from handlers.pxls.stats import StatsRecord
 
@@ -47,14 +47,16 @@ class StatsManager(DatabaseConnector):
 
     async def get_history(
         self,
-        username: str,
+        usernames: List[str],
         canvas_code: str,
     ) -> Iterator[StatsRecord]:
         """
         Get a user's stats history, sorted by increasing time.
         """
+        user_query = {f"stats.{username}": {"$exists": True} for username in usernames}
+        user_projection = {f"stats.{username}": True for username in usernames}
         async for document in self.collection.find(
-            {"canvas_code": canvas_code, f"stats.{username}": {"$exists": True}},
-            {"time": True, "canvas_code": True, f"stats.{username}": True},
+            {"canvas_code": canvas_code, **user_query},
+            {"time": True, "canvas_code": True, **user_projection},
         ).sort("time"):
             yield self._doc2record(document)
