@@ -6,6 +6,7 @@ from discord_slash.context import ComponentContext
 from discord_slash.utils import manage_components
 from discord_slash.model import ButtonStyle
 import numpy as np
+from aiocache import cached
 from handlers.image import image2buffer
 from handlers.pxls.template import Template
 
@@ -38,6 +39,7 @@ def attach_image(
     return file
 
 
+@cached(ttl=3600)
 async def get_owner_name(scope, owner_id, bot):
     """
     Get the owner's name.
@@ -47,7 +49,7 @@ async def get_owner_name(scope, owner_id, bot):
             owner = await bot.fetch_guild(owner_id)
             owner_name = owner.name
         except discord.errors.Forbidden:  # bot's been kicked from guild
-            owner_name = f"_an unknown faction_"
+            owner_name = "_an unknown faction_"
     else:
         owner = await bot.fetch_user(owner_id)
         owner_name = f"{owner.name}#{owner.discriminator}"
