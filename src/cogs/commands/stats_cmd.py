@@ -52,9 +52,10 @@ class StatsCommand(commands.Cog):
         Generate a pixel placing plot, render it and
         return the image binary data.
         """
-        _, ax = plt.subplots()
-        ax.grid(axis="y")
+        fig, ax = plt.subplots()
         ax.plot_date(dates, pixels, "-", color="#7289DA")
+        fig.autofmt_xdate()
+        ax.grid(axis="y")
         ax.spines["bottom"].set_visible(False)
         ax.spines["right"].set_visible(False)
         ax.spines["top"].set_visible(False)
