@@ -1,4 +1,6 @@
 from io import BytesIO
+from typing import Union
+import matplotlib
 import matplotlib.pyplot as plt
 import discord
 from discord.ext import commands
@@ -35,7 +37,7 @@ class StatsCommand(commands.Cog):
             dates.append(stats.time)
         if stats is None:
             raise UserError(f"`{username}` not found.")
-        description = f"Canvas pixels: {stats.get(username)['pixels']}\n"
+        description = f"Canvas pixels: {self.format(stats.get(username)['pixels'])}\n"
         description += f"Canvas ranking: {stats.get(username)['place']}\n"
         embed = discord.Embed(
             title=f"{username}'s stats",
@@ -47,7 +49,16 @@ class StatsCommand(commands.Cog):
         await ctx.send(embed=embed, file=file)
 
     @staticmethod
-    def plot(dates: list, pixels: list) -> BytesIO:
+    def format(number: Union[int, str]) -> str:
+        """
+        Formats an integer using a space as the
+        thousands separator.
+
+        :param number: An integer or its string representation.
+        """
+        return format(int(number), "_").replace("_", " ")
+
+    def plot(self, dates: list, pixels: list) -> BytesIO:
         """
         Generate a pixel placing plot, render it and
         return the image binary data.
@@ -55,6 +66,9 @@ class StatsCommand(commands.Cog):
         fig, ax = plt.subplots()
         ax.plot_date(dates, pixels, "-", color="#7289DA")
         fig.autofmt_xdate()
+        ax.yaxis.set_major_formatter(
+            matplotlib.ticker.FuncFormatter(lambda x, _: self.format(x))
+        )
         ax.grid(axis="y")
         ax.spines["bottom"].set_visible(False)
         ax.spines["right"].set_visible(False)

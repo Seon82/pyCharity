@@ -46,8 +46,8 @@ async def get_owner_name(scope, owner_id, bot):
         try:
             owner = await bot.fetch_guild(owner_id)
             owner_name = owner.name
-        except discord.errors.Forbidden:  # pycharity's been kicked from the server
-            owner_name = "_an unknown faction_"
+        except discord.errors.Forbidden:  # bot's been kicked from guild
+            owner_name = f"_an unknown faction_"
     else:
         owner = await bot.fetch_user(owner_id)
         owner_name = f"{owner.name}#{owner.discriminator}"
