@@ -9,6 +9,12 @@ class TemplateManager(DatabaseConnector):
     in the mongodb databse.
     """
 
+    def __init__(self, mongo_uri: str):
+        """
+        :param mongo_uri: The mongodb's uri, ie: mongodb://127.0.0.1:27017/
+        """
+        super().__init__(mongo_uri, "templates")
+
     def _doc2template(self, document) -> Template:
         """
         Convert a document to a Template.

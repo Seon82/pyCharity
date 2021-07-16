@@ -53,9 +53,7 @@ class TemplateCommand(commands.Cog):
         if not utils.check_template_link(url):
             raise UserError("Please provide a valid template link.")
         # Check if a template with the same name exists.
-        if await template_manager.check_name_exists(
-            name, canvas_code=canvas.info["canvasCode"]
-        ):
+        if await template_manager.check_name_exists(name, canvas_code=canvas.code):
             raise UserError(
                 "A template with this name already exists."
                 "If it doesn't appear in the global tracker, it means it's private."
@@ -105,7 +103,7 @@ class TemplateCommand(commands.Cog):
         if not utils.check_template_link(url):
             raise UserError("Please provide a valid template link.")
         template = await template_manager.get_template(
-            no_image=True, name=name, canvas_code=canvas.info["canvasCode"]
+            no_image=True, name=name, canvas_code=canvas.code
         )
         self._check_permissions(ctx, template)
         template = await Template.from_url(
@@ -130,13 +128,13 @@ class TemplateCommand(commands.Cog):
     async def _remove(self, ctx: SlashContext, name: str):
         # Only fetch the metadata and not the image
         template = await template_manager.get_template(
-            no_image=True, name=name, canvas_code=canvas.info["canvasCode"]
+            no_image=True, name=name, canvas_code=canvas.code
         )
         self._check_permissions(ctx, template)
         success = await template_manager.delete_template(
             name=name,
             owner=template.owner,
-            canvas_code=canvas.info["canvasCode"],
+            canvas_code=canvas.code,
         )
         if not success:
             raise UserError("Deletion failed. Please contact the bot developer.")
@@ -171,7 +169,7 @@ class TemplateCommand(commands.Cog):
         templates = {scope: [] for scope in scopes}
         # Only fetch the metadata and not the image
         template_generator = template_manager.get_templates(
-            no_image=True, canvas_code=canvas.info["canvasCode"]
+            no_image=True, canvas_code=canvas.code
         )
         async for template in template_generator:
             if (
@@ -208,7 +206,7 @@ class TemplateCommand(commands.Cog):
     async def _show(self, ctx: SlashContext, name: str):
         await ctx.defer()
         template = await template_manager.get_template(
-            name=name, canvas_code=canvas.info["canvasCode"]
+            name=name, canvas_code=canvas.code
         )
         if template is None:
             raise UserError("Invalid template name.")

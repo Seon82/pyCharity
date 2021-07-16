@@ -1,6 +1,7 @@
 from urllib.parse import urljoin
 import numpy as np
 from handlers.image import hex2rgba, PalettizedImage
+from handlers.pxls.stats import StatsRecord
 from handlers.pxls.utils import query
 
 
@@ -15,6 +16,13 @@ class Canvas:
         self.info = {}
         self.palette = []
         self.board = None
+
+    @property
+    def code(self) -> str:
+        """
+        Get the canvas' code
+        """
+        return self.info["canvasCode"]
 
     async def setup(self):
         """
@@ -59,3 +67,8 @@ class Canvas:
         """Update the canvas info, and update the palette."""
         self.info = await self.query("info", "json")
         self.palette = [hex2rgba(c["value"]) for c in self.info["palette"]]
+
+    async def fetch_stats(self) -> StatsRecord:
+        """Get the current stats."""
+        stats_json = await self.query("stats/stats.json", "json")
+        return StatsRecord.from_json(stats_json, self.code)

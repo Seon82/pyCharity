@@ -43,7 +43,7 @@ class LayerCommand(commands.Cog):
                 template = await BaseTemplate.from_url(template_name, canvas)
             else:
                 template = await template_manager.get_template(
-                    name=template_name, canvas_code=canvas.info["canvasCode"]
+                    name=template_name, canvas_code=canvas.code
                 )
                 if template is None:
                     raise UserError(f"{template_name} isn't a valid template name.")

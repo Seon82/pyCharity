@@ -1,5 +1,6 @@
 import asyncio
-from typing import Optional, Dict, List
+from io import BytesIO
+from typing import Optional, Dict, List, Union
 import discord
 from discord_slash.context import ComponentContext
 from discord_slash.utils import manage_components
@@ -17,15 +18,21 @@ class UserError(Exception):
     """
 
 
-def attach_image(image: np.ndarray, embed: discord.Embed) -> discord.File:
+def attach_image(
+    image: Union[np.ndarray, BytesIO], embed: discord.Embed
+) -> discord.File:
     """
-    Attach a rgba image array to a discord embed.
+    Attach an image to a discord embed.
 
-    :param image: The image to attach.
+    :param image: An rgba numpy array or a BytesIO image binary data.
     :param embed: The embed it should be attached to.
     :return: A discord.file object that should be sent with the embed.
     """
-    buffer = image2buffer(image)
+    if isinstance(image, BytesIO):
+        buffer = image
+    else:
+        buffer = image2buffer(image)
+
     file = discord.File(buffer, filename="image.png")
     embed.set_image(url="attachment://image.png")
     return file

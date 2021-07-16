@@ -27,6 +27,7 @@ class HelpCommand(commands.Cog):
                 " a link to an image."
             ),
             "users": "`/users`: Show the number of active users on pxls.space.",
+            "stats": "`/stats <username>`: Plot a user's placing activity.",
             "progress": (
                 "`/progress <template>`: See how much of a template has been placed!"
                 " You can use template links or names from the tracker."

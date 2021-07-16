@@ -3,7 +3,7 @@ import asyncio
 import logging
 from dotenv import load_dotenv
 from handlers.pxls import Canvas
-from handlers.database import TemplateManager
+from handlers.database import TemplateManager, StatsManager
 from handlers.imgur_uploader import ImgurUploader
 from handlers.websocket import WebsocketClient
 
@@ -32,6 +32,9 @@ asyncio.get_event_loop().run_until_complete(canvas.setup())
 
 # Template manager
 template_manager = TemplateManager(os.getenv("DB_CONNECTION"))
+
+# Stats manager
+stats_manager = StatsManager(os.getenv("DB_CONNECTION"))
 
 # Websocket
 ws_client = WebsocketClient(uri=os.getenv("PXLS_WEBSOCKET"), canvas=canvas)

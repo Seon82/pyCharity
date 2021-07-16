@@ -1,7 +1,8 @@
+from datetime import datetime
 import logging
 from discord.ext import tasks, commands
 from handlers.pxls import compute_progress, Template, layer
-from handlers.setup import canvas, ws_client, template_manager, base_url
+from handlers.setup import canvas, ws_client, template_manager, stats_manager, base_url
 
 logger = logging.getLogger("pyCharity." + __name__)
 
@@ -14,6 +15,7 @@ class Clock(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.last_updated_stats = datetime.now()
         # pylint: disable = no-member
         self.update_board.start()
 
@@ -34,11 +36,19 @@ class Clock(commands.Cog):
             ws_client.resume()
         except Exception as error:
             logger.warning(f"Error while fetching board: {error}")
+        # Update stats
+        try:
+            stats = await canvas.fetch_stats()
+            if stats.time != self.last_updated_stats:
+                await stats_manager.add_record(stats)
+                self.last_updated_stats = stats.time
+                logger.debug("Updated stats.")
+        except Exception as error:
+            logger.warning(f"Error while updating stats: {error}")
+
         # Update progress
         try:
-            templates = template_manager.get_templates(
-                canvas_code=canvas.info["canvasCode"]
-            )
+            templates = template_manager.get_templates(canvas_code=canvas.code)
             async for template in templates:
                 new_progress = await compute_progress(canvas, template)
                 await template_manager.update_template(
@@ -51,7 +61,7 @@ class Clock(commands.Cog):
         try:
             combo, combo_exists = None, False
             templates = template_manager.get_templates(
-                canvas_code=canvas.info["canvasCode"], scope={"$ne": "private"}
+                canvas_code=canvas.code, scope={"$ne": "private"}
             )
             async for template in templates:
                 if combo is None:

@@ -191,7 +191,7 @@ class Template(BaseTemplate):
             name=name,
             url=url,
             owner=owner,
-            canvas_code=canvas.info["canvasCode"],
+            canvas_code=canvas.code,
             scope=scope,
             progress=progress,
         )

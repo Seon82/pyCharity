@@ -10,12 +10,13 @@ class DatabaseConnector:
     a mongodb database.
     """
 
-    def __init__(self, mongo_uri: str):
+    def __init__(self, mongo_uri: str, collection_name: str):
         """
         :param mongo_uri: The mongodb's uri, ie: mongodb://127.0.0.1:27017/
+        :param collection_name: THe collection this database connector should interact with.
         """
         mongo_client = AsyncIOMotorClient(mongo_uri)
-        self.collection = mongo_client.pycharity.templates
+        self.collection = mongo_client.pycharity[collection_name]
 
     @staticmethod
     def _serialize(data) -> Binary:
