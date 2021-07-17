@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Dict, List
 import discord
 from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
@@ -166,7 +166,7 @@ class TemplateCommand(commands.Cog):
                 display_progress_pixels = True
 
         scopes = ["private", "global", "faction"]
-        templates = {scope: [] for scope in scopes}
+        templates: Dict[str, List[Template]] = {scope: [] for scope in scopes}
         # Only fetch the metadata and not the image
         template_generator = template_manager.get_templates(
             no_image=True, canvas_code=canvas.code

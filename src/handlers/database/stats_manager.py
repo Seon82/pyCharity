@@ -1,4 +1,4 @@
-from typing import Iterator, List
+from typing import AsyncGenerator, List, Dict, Any
 from handlers.database import DatabaseConnector
 from handlers.pxls.stats import StatsRecord
 
@@ -20,7 +20,7 @@ class StatsManager(DatabaseConnector):
         """
         Convert a StatsRecord to a document.
         """
-        document = dict()
+        document: Dict[str, Any] = dict()
         # pylint: disable = protected-access
         document["stats"] = record._stats
         document["canvas_code"] = record.canvas_code
@@ -49,7 +49,7 @@ class StatsManager(DatabaseConnector):
         self,
         usernames: List[str],
         canvas_code: str,
-    ) -> Iterator[StatsRecord]:
+    ) -> AsyncGenerator[StatsRecord, None]:
         """
         Get a user's stats history, sorted by increasing time.
         """

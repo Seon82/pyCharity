@@ -1,4 +1,4 @@
-from typing import Iterator
+from typing import AsyncGenerator
 from handlers.pxls import Template, Progress
 from handlers.database import DatabaseConnector
 
@@ -92,7 +92,9 @@ class TemplateManager(DatabaseConnector):
             return None
         return self._doc2template(document)
 
-    async def get_templates(self, no_image=False, **query) -> Iterator[Template]:
+    async def get_templates(
+        self, no_image=False, **query
+    ) -> AsyncGenerator[Template, None]:
         """
         Get a generator returning templates in the database matching the query.
 

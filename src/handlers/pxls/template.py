@@ -148,7 +148,7 @@ class Template(BaseTemplate):
 
     # pylint: disable = arguments-differ
     @classmethod
-    async def from_url(
+    async def from_url(  # type: ignore
         cls, url: str, canvas: Canvas, name: str, owner: int, scope: str
     ):
         """

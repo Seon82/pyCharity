@@ -12,7 +12,7 @@ class PalettizedImage:
         self.image = array
 
     @aioify
-    def render(self, palette: list) -> np.array:
+    def render(self, palette: list) -> np.ndarray:
         """
         Convert the quantized image to a rgba image array.
         Any color index present in the palettized image but \

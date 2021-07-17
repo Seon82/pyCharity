@@ -115,7 +115,7 @@ async def ask_alternatives(
 
 async def render_list(
     bot,
-    templates: List[Dict[str, List[Template]]],
+    templates: Dict[str, List[Template]],
     display_progress_pixels: bool,
     embed_color: int,
 ):

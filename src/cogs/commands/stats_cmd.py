@@ -31,10 +31,12 @@ class StatsCommand(commands.Cog):
         ],
     )
     @commands.cooldown(1, 1, commands.BucketType.user)
-    async def _stats(self, ctx: SlashContext, **usernames):
-        usernames = list(usernames.values())
+    async def _stats(self, ctx: SlashContext, **selected_usernames: Dict[str, str]):
+        usernames = [username for _, username in selected_usernames.items()]
         records = stats_manager.get_history(usernames, canvas.code)
-        history = {username: {"dates": [], "pixels": []} for username in usernames}
+        history: Dict[str, Dict[str, list]] = {
+            username: {"dates": [], "pixels": []} for username in usernames
+        }
         record = None
         async for record in records:
             for username in usernames:
@@ -50,10 +52,9 @@ class StatsCommand(commands.Cog):
         for username in usernames:
             if len(usernames) > 1:
                 description += f"**{username}**\n"
-            description += (
-                f"Canvas pixels: {self.format(record.get(username)['pixels'])}\n"
-            )
-            description += f"Canvas ranking: {record.get(username)['place']}\n"
+            stats = record.get(username)
+            description += f"Canvas pixels: {self.format(stats['pixels'])}\n"  # type: ignore
+            description += f"Canvas ranking: {stats['place']}\n"  # type: ignore
         if len(usernames) == 1:
             title = f"{usernames[0]}'s stats"
         else:
