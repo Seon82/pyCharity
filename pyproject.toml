@@ -1,11 +1,11 @@
 [tool.poetry]
 name = "pycharity"
-version = "1.0beta2"
+version = "1.0.0"
 description = "A python port of Mikarific's charity bot."
 authors = ["Seon"]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 "discord.py" = "^1.7.3"
 aiohttp = "^3.7.4"
 aioify = "^0.4.0"
@@ -13,11 +13,11 @@ python-dotenv = "^0.18.0"
 numpy = "^1.21.0"
 motor = "^2.4.0"
 websockets = "^9.1"
-discord-py-slash-command = {git = "https://github.com/Seon82/discord-py-interactions"}
 Cython = "^0.29.23"
 opencv-python = "^4.5.2"
 matplotlib = "^3.4.2"
 aiocache = "^0.11.1"
+discord-py-interactions = "^3.0.2"
 
 [tool.poetry.dev-dependencies]
 black = "^21.6b0"
