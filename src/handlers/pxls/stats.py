@@ -27,7 +27,7 @@ class StatsRecord:
         """
         date_str = json["generatedAt"].split(" (")[0]
         time = datetime.strptime(date_str, "%Y/%m/%d - %H:%M:%S")
-        stats_dict = dict()
+        stats_dict = {}
         for stats in json["toplist"]["canvas"]:
             stats_dict[stats["username"]] = {
                 "pixels": stats["pixels"],

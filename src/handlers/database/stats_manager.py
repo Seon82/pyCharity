@@ -20,7 +20,7 @@ class StatsManager(DatabaseConnector):
         """
         Convert a StatsRecord to a document.
         """
-        document: Dict[str, Any] = dict()
+        document: Dict[str, Any] = {}
         # pylint: disable = protected-access
         document["stats"] = record._stats
         document["canvas_code"] = record.canvas_code
