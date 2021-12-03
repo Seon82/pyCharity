@@ -99,7 +99,7 @@ class BaseTemplate(PalettizedImage):
         # Don't try to vectorize this, using np.stack and argmin
         # uses a crazy amount of memory and is a tad slower on real images.
         best_match_idx = np.zeros(rendered_array.shape[:2], dtype=np.uint8)
-        best_match_dist = np.full(rendered_array.shape[:2], 500)  # 500<sqrt(3*255^2)
+        best_match_dist = np.full(rendered_array.shape[:2], 500)  # 500>sqrt(3*255^2)
         for idx, color in enumerate(palette):
             color_distance = np.linalg.norm(rendered_array - color, axis=-1)
             closer_mask = color_distance < best_match_dist
